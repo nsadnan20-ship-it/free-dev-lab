@@ -1,0 +1,10 @@
+export interface LineageNode { id:string; label:string; kind:'source'|'transform'|'metric'|'report'; details:string; }
+export interface LineageGraph { nodes:LineageNode[]; edges:Array<{from:string;to:string}>; }
+
+export const METRIC_LINEAGE: Record<string,LineageGraph> = {
+  net_sales:{nodes:[{id:'sales_invoices',label:'فواتير المبيعات',kind:'source',details:'sales_invoices.subtotal / total'},{id:'net_sales_calc',label:'تجميع المبيعات',kind:'transform',details:'SUM(subtotal)'},{id:'net_sales',label:'صافي المبيعات',kind:'metric',details:'Business Metric: net_sales'},{id:'dashboards',label:'لوحات وتقارير',kind:'report',details:'Executive Cockpit / Reports / Chat2BI'}],edges:[{from:'sales_invoices',to:'net_sales_calc'},{from:'net_sales_calc',to:'net_sales'},{from:'net_sales',to:'dashboards'}]},
+  gross_profit:{nodes:[{id:'sales_items',label:'بنود المبيعات',kind:'source',details:'sale_items.line_total / cost_price / quantity'},{id:'profit_calc',label:'حساب التكلفة والربح',kind:'transform',details:'line_total - cost_price × quantity'},{id:'gross_profit',label:'مجمل الربح',kind:'metric',details:'Business Metric: gross_profit'},{id:'dashboards',label:'لوحات وتقارير',kind:'report',details:'Profitability / Cockpit / Chat2BI'}],edges:[{from:'sales_items',to:'profit_calc'},{from:'profit_calc',to:'gross_profit'},{from:'gross_profit',to:'dashboards'}]},
+  inventory_value:{nodes:[{id:'inventory_balances',label:'أرصدة المخزون',kind:'source',details:'inventory_balances.quantity / unit_cost'},{id:'inventory_calc',label:'تقييم المخزون',kind:'transform',details:'quantity × unit_cost'},{id:'inventory_value',label:'قيمة المخزون',kind:'metric',details:'Business Metric: inventory_value'},{id:'inventory_intelligence',label:'ذكاء المخزون',kind:'report',details:'Liquidity / Forecast / Cockpit'}],edges:[{from:'inventory_balances',to:'inventory_calc'},{from:'inventory_calc',to:'inventory_value'},{from:'inventory_value',to:'inventory_intelligence'}]}
+};
+
+export function getMetricLineage(metricKey:string):LineageGraph|null{return METRIC_LINEAGE[metricKey]||null;}

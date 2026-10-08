@@ -1,0 +1,21 @@
+export interface WatchedFolderConfig { id:string; path:string; enabled:boolean; recursive:boolean; pollIntervalMs:number; allowedExtensions:string[]; autoProcess:boolean; maxConcurrent:number; }
+export interface WatchEvent { folderId:string; path:string; event:'created'|'changed'|'deleted'|'scan'; observedAt:string; }
+export interface ImportQueueItem { id:string; folderId:string; path:string; discoveredAt:string; attempts:number; status:'queued'|'processing'|'completed'|'failed'|'dead_letter'; lastError?:string; }
+export type FolderWatchPlatform='web'|'pwa'|'windows'|'android'|'ios';
+export interface FolderWatchCapabilities { platform:FolderWatchPlatform; directorySelection:boolean; activeSessionWatch:boolean; persistentBackgroundWatch:boolean; nativeDirectoryPermission:boolean; recursiveWatch:boolean; notes:string; }
+export interface FolderWatchAdapter { platform:FolderWatchPlatform; capabilities:FolderWatchCapabilities; selectDirectory():Promise<string>; start(config:WatchedFolderConfig,onEvent:(event:WatchEvent)=>void):Promise<void>; stop(folderId:string):Promise<void>; }
+
+function finiteNumber(value:unknown,fallback:number):number{const n=Number(value);return Number.isFinite(n)?n:fallback;}
+export function normalizeWatchConfig(input:Partial<WatchedFolderConfig>):WatchedFolderConfig { return {id:String(input.id??'').trim(),path:String(input.path??'').trim(),enabled:input.enabled!==false,recursive:input.recursive!==false,pollIntervalMs:Math.max(1000,finiteNumber(input.pollIntervalMs,5000)),allowedExtensions:(input.allowedExtensions??['.pdf','.xlsx','.xls','.csv','.docx','.doc','.txt']).map(x=>String(x).toLowerCase().startsWith('.')?String(x).toLowerCase():`.${String(x).toLowerCase()}`),autoProcess:input.autoProcess!==false,maxConcurrent:Math.max(1,Math.min(8,finiteNumber(input.maxConcurrent,2)))}; }
+export function validateWatchedFolderConfig(config:WatchedFolderConfig):void{if(!config.id)throw new Error('WATCH_FOLDER_ID_REQUIRED');if(!config.path)throw new Error('WATCH_FOLDER_PATH_REQUIRED');if(!Number.isFinite(config.pollIntervalMs)||config.pollIntervalMs<1000)throw new Error('WATCH_FOLDER_POLL_INTERVAL_INVALID');if(!Number.isFinite(config.maxConcurrent)||config.maxConcurrent<1||config.maxConcurrent>8)throw new Error('WATCH_FOLDER_CONCURRENCY_INVALID');if(config.allowedExtensions.length===0)throw new Error('WATCH_FOLDER_EXTENSIONS_REQUIRED');}
+export function shouldQueue(event:WatchEvent, config:WatchedFolderConfig):boolean { return config.enabled && Boolean(config.id&&config.path) && (event.event==='created'||event.event==='changed'||event.event==='scan') && config.allowedExtensions.some(ext=>event.path.toLowerCase().endsWith(ext)); }
+
+export const FOLDER_WATCH_PLATFORM_CAPABILITIES:Record<FolderWatchPlatform,FolderWatchCapabilities>={
+ web:{platform:'web',directorySelection:true,activeSessionWatch:true,persistentBackgroundWatch:false,nativeDirectoryPermission:false,recursiveWatch:true,notes:'File System Access where available; monitoring is session-bound.'},
+ pwa:{platform:'pwa',directorySelection:true,activeSessionWatch:true,persistentBackgroundWatch:false,nativeDirectoryPermission:false,recursiveWatch:true,notes:'Installed PWA uses the same browser capability boundary; no false background promise.'},
+ windows:{platform:'windows',directorySelection:true,activeSessionWatch:true,persistentBackgroundWatch:true,nativeDirectoryPermission:true,recursiveWatch:true,notes:'Requires a native host adapter; events feed the canonical WatchEvent/queue pipeline.'},
+ android:{platform:'android',directorySelection:true,activeSessionWatch:true,persistentBackgroundWatch:true,nativeDirectoryPermission:true,recursiveWatch:true,notes:'Requires Android Storage Access Framework/native watcher adapter; events feed the canonical pipeline.'},
+ ios:{platform:'ios',directorySelection:true,activeSessionWatch:true,persistentBackgroundWatch:false,nativeDirectoryPermission:true,recursiveWatch:false,notes:'Capability-aware integration; arbitrary persistent background folder watching is not claimed.'}
+};
+
+export function getFolderWatchCapabilities(platform:FolderWatchPlatform):FolderWatchCapabilities{return FOLDER_WATCH_PLATFORM_CAPABILITIES[platform];}

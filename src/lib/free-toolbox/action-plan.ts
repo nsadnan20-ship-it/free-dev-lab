@@ -1,0 +1,4 @@
+import {arbitrateDecisions,type DecisionCandidate,type ArbitratedDecision} from './decision-arbitrator';
+export interface ActionStep{order:number;decisionId:string;title:string;action:string;expectedEffect:string;requiresApproval:boolean;status:'pending';}
+export interface ActionPlan{createdAt:string;steps:ActionStep[];decisions:ArbitratedDecision[];}
+export function buildActionPlan(candidates:DecisionCandidate[],now=new Date()):ActionPlan{const result=arbitrateDecisions(candidates);const steps=result.decisions.map((d,i)=>({order:i+1,decisionId:d.id,title:d.title,action:d.recommendedAction,expectedEffect:d.liquidityEffect>=0?'تحسين أو حماية السيولة':'تقليل استهلاك السيولة',requiresApproval:d.band==='critical'||d.amount>0,status:'pending' as const}));return{createdAt:now.toISOString(),steps,decisions:result.decisions};}

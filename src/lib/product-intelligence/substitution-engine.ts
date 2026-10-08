@@ -1,0 +1,6 @@
+export type SubstitutionType='direct'|'acceptable'|'partial'|'independent';
+export interface SubstitutionRule{fromProduct:string;toProduct:string;type:SubstitutionType;weight:number;manual:boolean;}
+export interface SubstitutionInput{productCode:string;stock:number;demand:number;stocks:Record<string,number>;rules:SubstitutionRule[];}
+export interface SubstitutionResult{productCode:string;directStock:number;effectiveSubstituteStock:number;effectiveAvailable:number;uncoveredDemand:number;coverageRatio:number|null;}
+const weights:Record<SubstitutionType,number>={direct:1,acceptable:.8,partial:.5,independent:0};
+export function calculateSubstitution(input:SubstitutionInput):SubstitutionResult{const direct=input.stock;const effectiveSubstituteStock=input.rules.filter(r=>r.fromProduct===input.productCode&&r.toProduct!==input.productCode).reduce((s,r)=>s+(input.stocks[r.toProduct]??0)*weights[r.type]*Math.max(0,Math.min(1,r.weight)),0);const effectiveAvailable=direct+effectiveSubstituteStock;const uncoveredDemand=Math.max(0,input.demand-effectiveAvailable);return{productCode:input.productCode,directStock:direct,effectiveSubstituteStock,effectiveAvailable,uncoveredDemand,coverageRatio:input.demand>0?effectiveAvailable/input.demand:null};}

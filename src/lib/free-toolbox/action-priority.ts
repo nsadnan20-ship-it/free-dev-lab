@@ -1,0 +1,3 @@
+export interface ActionCandidate{id:string;title:string;urgency:number;impact:number;effort:number;confidence:number;dependencies?:string[];evidenceIds?:string[]}
+export interface PrioritizedAction extends ActionCandidate{score:number;rank:number}
+export function prioritizeActions(actions:ActionCandidate[]):PrioritizedAction[]{const scored=actions.map(a=>{const urgency=Math.max(0,Math.min(100,a.urgency));const impact=Math.max(0,Math.min(100,a.impact));const effort=Math.max(1,Math.min(100,a.effort));const confidence=Math.max(0,Math.min(100,a.confidence));const score=urgency*.3+impact*.35+confidence*.2+(100-effort)*.15;return{...a,score}}).sort((a,b)=>b.score-a.score);return scored.map((a,i)=>({...a,rank:i+1}));}

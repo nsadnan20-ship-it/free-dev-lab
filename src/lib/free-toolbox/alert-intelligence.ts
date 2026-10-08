@@ -1,0 +1,5 @@
+export type AlertSeverity='info'|'watch'|'warning'|'critical';
+export interface AlertSignal{key:string;label:string;value:number;threshold:number;higherIsWorse?:boolean;confidence?:number;sourceIds?:string[]}
+export interface SmartAlert{key:string;label:string;severity:AlertSeverity;value:number;threshold:number;message:string;confidence:number;sourceIds:string[]}
+const severity=(ratio:number):AlertSeverity=>ratio>=2?'critical':ratio>=1.5?'warning':ratio>=1?'watch':'info';
+export function evaluateAlerts(signals:AlertSignal[]):SmartAlert[]{return signals.map(s=>{const higherIsWorse=s.higherIsWorse!==false;const ratio=higherIsWorse?s.value/s.threshold:s.threshold/Math.max(Math.abs(s.value),Number.EPSILON);const level=severity(ratio);return{key:s.key,label:s.label,severity:level,value:s.value,threshold:s.threshold,message:`${s.label}: القيمة ${s.value} مقابل حد ${s.threshold}`,confidence:Math.max(0,Math.min(100,s.confidence??100)),sourceIds:s.sourceIds??[]};}).filter(a=>a.severity!=='info');}

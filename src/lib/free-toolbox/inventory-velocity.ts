@@ -1,0 +1,5 @@
+export type LiquidityClass='liquid'|'slow'|'stagnant';
+export interface VelocityInput{sku:string;stock:number;soldUnits:number;periodDays:number;unitCost?:number}
+export interface VelocityResult{sku:string;dailyVelocity:number;daysOfCover:number|null;sellThroughRate:number;liquidity:LiquidityClass;stockValue?:number}
+export function calculateVelocity(i:VelocityInput):VelocityResult{const days=Math.max(1,i.periodDays),sold=Math.max(0,i.soldUnits),stock=Math.max(0,i.stock);const daily=sold/days;const cover=daily>0?stock/daily:null;const sellThrough=(sold+stock)>0?sold/(sold+stock):0;const liquidity:LiquidityClass=cover!==null&&cover<=30?'liquid':cover!==null&&cover<=90?'slow':'stagnant';return{sku:i.sku,dailyVelocity:daily,daysOfCover:cover,sellThroughRate:sellThrough,liquidity,stockValue:i.unitCost===undefined?undefined:stock*i.unitCost};}
+export function rankVelocity(items:VelocityInput[]){return items.map(calculateVelocity).sort((a,b)=>{const rank=(x:LiquidityClass)=>x==='stagnant'?0:x==='slow'?1:2;return rank(a.liquidity)-rank(b.liquidity)||((b.daysOfCover??Infinity)-(a.daysOfCover??Infinity));});}

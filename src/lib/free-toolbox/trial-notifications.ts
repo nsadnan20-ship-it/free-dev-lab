@@ -1,0 +1,4 @@
+import type {License} from './licensing';
+export type TrialNotice='welcome'|'7_days'|'3_days'|'1_day'|'expired';
+export function dueTrialNotice(l:License,now=new Date()):TrialNotice|null{if(!l.expiresAt)return null;const days=(new Date(l.expiresAt).getTime()-now.getTime())/86400000;if(days<=0)return'expired';if(days<=1)return'1_day';if(days<=3)return'3_days';if(days<=7)return'7_days';return null}
+export const trialMessages:Record<TrialNotice,string>={welcome:'مرحباً بك. جميع مزايا المنظومة المتقدمة متاحة لك خلال الفترة التجريبية.','7_days':'متبقي 7 أيام تقريباً على انتهاء التجربة. بياناتك وتقاريرك محفوظة.','3_days':'متبقي 3 أيام تقريباً. فعّل النسخة الأصلية للاستمرار في جميع المزايا.','1_day':'تبقى حوالي 24 ساعة على انتهاء التجربة. لا تفقد تحليلاتك المتقدمة.',expired:'انتهت الفترة التجريبية. بياناتك محفوظة ويمكن تفعيل النسخة الأصلية لاستعادة جميع المزايا.'};

@@ -1,0 +1,7 @@
+export type CanonicalType='text'|'number'|'date'|'currency'|'quantity'|'sku';
+export interface CanonicalField{key:string;source:string;type:CanonicalType;confidence:number;required:boolean;}
+export interface CanonicalDataset{fields:CanonicalField[];rows:Record<string,unknown>[];warnings:string[];}
+const TYPE_BY_KEY:Record<string,CanonicalType>={sku:'sku',name:'text',quantity:'quantity',price:'currency',date:'date',customer:'text',supplier:'text',total:'currency'};
+function normalize(v:unknown){return String(v??'').normalize('NFKC').replace(/[\u200B-\u200D\uFEFF]/g,'').trim();}
+function numeric(v:string){const s=v.replace(/[٠-٩]/g,c=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(c))).replace(/[٬,]/g,'').replace(/[٫]/g,'.').replace(/[^0-9.+-]/g,'');const n=Number(s);return Number.isFinite(n)?n:v;}
+export function buildCanonicalDataset(rows:Record<string,unknown>[],mappings:{source:string;canonical:string;confidence:number}[]):CanonicalDataset{const warnings:string[]=[];const fields=mappings.map(m=>({key:m.canonical,source:m.source,type:TYPE_BY_KEY[m.canonical]??'text',confidence:m.confidence,required:['sku','name'].includes(m.canonical)}));const out=rows.map(row=>{const r:Record<string,unknown>={};for(const f of fields){const raw=normalize(row[f.source]);r[f.key]=f.type==='currency'||f.type==='quantity'?numeric(raw):raw;}return r;});if(!fields.some(f=>f.key==='sku'))warnings.push('No SKU field was confidently detected');if(!fields.some(f=>f.key==='date'))warnings.push('No date field was confidently detected');return{fields,rows:out,warnings};}

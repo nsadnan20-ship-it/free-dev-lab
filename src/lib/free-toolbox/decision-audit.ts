@@ -1,0 +1,2 @@
+export interface DecisionAudit{decisionId:string;timestamp:string;inputs:Record<string,number|string|boolean>;formula:string;result:number|string;confidence:number;warnings:string[];}
+export function createDecisionAudit(decisionId:string,inputs:DecisionAudit['inputs'],formula:string,result:number|string,confidence:number,warnings:string[]=[],timestamp=new Date().toISOString()):DecisionAudit{return{decisionId,timestamp,inputs,formula,result,confidence:Math.max(0,Math.min(100,confidence)),warnings};}

@@ -1,0 +1,7 @@
+import type {CanonicalField} from './canonical-schema';
+import {getCanonicalFieldDefinitions,matchCanonicalField} from './canonical-schema';
+export interface FieldMapping{sourceHeader:string;field?:CanonicalField;confidence:number;method:'exact'|'alias'|'fuzzy'|'manual'|'unmapped';requiresReview:boolean;}
+const tokens=(s:string)=>s.toLowerCase().normalize('NFKC').replace(/[إأآ]/g,'ا').replace(/ة/g,'ه').replace(/[\s_\-./]+/g,' ').trim().split(' ').filter(Boolean);
+const similarity=(a:string,b:string)=>{const A=new Set(tokens(a)),B=new Set(tokens(b));const inter=[...A].filter(x=>B.has(x)).length;return inter/Math.max(1,new Set([...A,...B]).size)};
+export function mapHeader(header:string,override?:CanonicalField):FieldMapping{if(override)return{sourceHeader:header,field:override,confidence:1,method:'manual',requiresReview:false};const exact=matchCanonicalField(header);if(exact)return{sourceHeader:header,field:exact,confidence:1,method:'alias',requiresReview:false};let best:CanonicalField|undefined,bestScore=0;for(const d of getCanonicalFieldDefinitions())for(const alias of d.aliases){const s=similarity(header,alias);if(s>bestScore){bestScore=s;best=d.field;}}if(bestScore>=.65)return{sourceHeader:header,field:best,confidence:Math.min(.95,.65+bestScore*.3),method:'fuzzy',requiresReview:bestScore<.8};return{sourceHeader:header,confidence:0,method:'unmapped',requiresReview:true};}
+export function mapHeaders(headers:string[],overrides:Record<string,CanonicalField>={}):FieldMapping[]{return headers.map(h=>mapHeader(h,overrides[h]));}

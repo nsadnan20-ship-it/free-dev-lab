@@ -1,0 +1,4 @@
+import type {License} from './licensing';
+import type {UsageSummary} from './usage-meter';
+export interface EngagementScore{score:number;level:'low'|'medium'|'high';signals:string[]}
+export function engagementScore(license:License,usage:UsageSummary):EngagementScore{let score=0;const signals:string[]=[];score+=Math.min(30,usage.activeDays*3);if(usage.byEvent.analysis>0){score+=15;signals.push('analysis_used')}if(usage.byEvent.forecast>0){score+=15;signals.push('forecast_used')}if(usage.byEvent.report>0){score+=10;signals.push('report_used')}if(usage.byEvent.what_if>0){score+=10;signals.push('what_if_used')}if(usage.byEvent.export>0){score+=10;signals.push('export_used')}if(usage.byEvent.ai_question>0){score+=10;signals.push('assistant_used')}if(license.trialDays>=14&&usage.activeDays>=7)signals.push('returning_user');score=Math.min(100,score);return{score,level:score>=70?'high':score>=40?'medium':'low',signals}}

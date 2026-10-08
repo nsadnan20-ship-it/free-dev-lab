@@ -1,0 +1,6 @@
+import {canonicalizeHeader,CanonicalField} from './accounting-header-dictionary';
+export interface ImportProfile {id:string;source:string;reportKind:string;headerMap:Record<string,CanonicalField>;approvedAt?:string;version:number;}
+export interface ProfileMatch {profile?:ImportProfile;confidence:number;matchedHeaders:number;reason:string;}
+export function createImportProfile(input:{id:string;source:string;reportKind:string;headers:string[];approvedAt?:string}):ImportProfile{const map:Record<string,CanonicalField>={};for(const h of input.headers){const f=canonicalizeHeader(h);if(f)map[h]=f;}return {id:input.id,source:input.source,reportKind:input.reportKind,headerMap:map,approvedAt:input.approvedAt,version:1};}
+export function matchImportProfile(profile:ImportProfile,headers:string[]):ProfileMatch{const mapped=headers.map(h=>profile.headerMap[h]).filter(Boolean);const ratio=headers.length?mapped.length/headers.length:0;return {profile:ratio>=.8?profile:undefined,confidence:ratio,matchedHeaders:mapped.length,reason:ratio>=.8?'profile matches trusted header mapping':'profile match requires review'};}
+export function profileCanAutoApply(match:ProfileMatch){return Boolean(match.profile&&match.confidence>=.95&&match.profile.approvedAt);}

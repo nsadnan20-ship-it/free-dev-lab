@@ -1,0 +1,4 @@
+export interface TenantScopedMember{tenantId:string;sku:string;groupId:string}
+export interface SecurityIssue{code:string;sku?:string;groupId?:string;severity:'error'|'warning'}
+export function validateAlternativeGroupIsolation(members:TenantScopedMember[]):SecurityIssue[]{const issues:SecurityIssue[]=[];const seen=new Map<string,TenantScopedMember>();for(const m of members){if(!m.tenantId||!m.sku||!m.groupId){issues.push({code:'INCOMPLETE_GROUP_MEMBER',sku:m.sku,groupId:m.groupId,severity:'error'});continue}const key=`${m.tenantId}:${m.sku}`;const prior=seen.get(key);if(prior&&prior.groupId!==m.groupId)issues.push({code:'SKU_MULTIPLE_GROUPS',sku:m.sku,groupId:m.groupId,severity:'error'});else seen.set(key,m)}return issues}
+export function filterTenantMembers<T extends TenantScopedMember>(members:T[],tenantId:string):T[]{return members.filter(m=>m.tenantId===tenantId)}
