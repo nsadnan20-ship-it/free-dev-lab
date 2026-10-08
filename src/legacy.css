@@ -1,7 +1,4 @@
 /* BUILD_PROVENANCE_MARKER: exact source SHA is embedded into dist/index.html during build. */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 :root{
   --ag-color-canvas:#f6f7fb;
   --ag-color-surface:#ffffff;
@@ -48,12 +45,12 @@ button,input,textarea,select{font:inherit}
 .card-hover{@apply transition-[border-color,box-shadow,transform] duration-150 hover:-translate-y-px hover:border-ink-300 hover:shadow-card-hover}
 .card > .card-body-divider{@apply border-t border-ink-100}
 .card-subtle{@apply rounded-[10px] border border-ink-100 bg-ink-50/60}
-.btn{@apply inline-flex items-center justify-center gap-2 rounded-[9px] px-3.5 py-2.5 text-sm font-semibold transition-[background-color,border-color,color,box-shadow] duration-150 disabled:cursor-not-allowed disabled:opacity-50}
+@utility btn{@apply inline-flex items-center justify-center gap-2 rounded-[9px] px-3.5 py-2.5 text-sm font-semibold transition-[background-color,border-color,color,box-shadow] duration-150 disabled:cursor-not-allowed disabled:opacity-50}
 .btn-primary{@apply btn bg-primary-700 text-white shadow-sm hover:bg-primary-800 active:bg-primary-900}
 .btn-secondary{@apply btn border border-ink-200 bg-white text-ink-700 hover:border-ink-300 hover:bg-ink-50 hover:text-ink-900}
 .btn-ghost{@apply btn text-ink-600 hover:bg-ink-100 hover:text-ink-950}
 .input{@apply w-full rounded-[9px] border border-ink-200 bg-white px-3.5 py-2.5 text-sm text-ink-900 outline-none transition-[border-color,box-shadow] focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10}
-.badge{@apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold}
+@utility badge{@apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold}
 .badge-primary{@apply badge bg-primary-50 text-primary-800 ring-1 ring-inset ring-primary-100}
 .badge-success{@apply badge bg-success-50 text-success-700 ring-1 ring-inset ring-success-100}
 .badge-warning{@apply badge bg-warning-50 text-warning-800 ring-1 ring-inset ring-warning-100}
