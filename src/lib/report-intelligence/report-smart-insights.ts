@@ -418,6 +418,8 @@ function deriveSignals(report: ReportInput): ReportSignal[] {
         const stock = numeric(rowValue(row.data, stockKey));
         if (stock == null) continue;
         totalStock += stock;
+        const productName = text(rowValue(row.data, productNameKey)) || text(rowValue(row.data, skuKey)) || 'صنف غير مسمى';
+        const rowRef = row.row_number == null ? '' : 'الصف=' + row.row_number + ' · ';
         if (stock < 0) {
           negativeStockRows += 1;
           if (negativeStockSamples.length < 5) negativeStockSamples.push(rowRef + productName + ' · الرصيد=' + stock);
@@ -428,8 +430,6 @@ function deriveSignals(report: ReportInput): ReportSignal[] {
         const netSales = netSalesKey ? numeric(rowValue(row.data, netSalesKey)) : null;
         const sourceStockoutDays = stockoutDaysKey ? numeric(rowValue(row.data, stockoutDaysKey)) : null;
         const salesForCoverage = netSales;
-        const productName = text(rowValue(row.data, productNameKey)) || text(rowValue(row.data, skuKey)) || 'صنف غير مسمى';
-        const rowRef = row.row_number == null ? '' : 'الصف=' + row.row_number + ' · ';
         // Coverage is a time measure. Prefer the source's own stockout period;
         // otherwise derive days from current stock / daily sales rate.
         let coverageDays: number | null = null;
