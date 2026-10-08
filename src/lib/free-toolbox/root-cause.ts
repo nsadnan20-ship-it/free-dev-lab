@@ -1,0 +1,3 @@
+export interface CauseFactor{key:string;label:string;impact:number;direction:'positive'|'negative'|'neutral';evidence?:string}
+export interface RootCauseResult{primary:CauseFactor|null;ranked:CauseFactor[];totalImpact:number;explanation:string}
+export function analyzeRootCauses(factors:CauseFactor[]):RootCauseResult{const ranked=[...factors].filter(f=>Number.isFinite(f.impact)).sort((a,b)=>Math.abs(b.impact)-Math.abs(a.impact));const primary=ranked[0]??null;const totalImpact=ranked.reduce((s,f)=>s+f.impact,0);const explanation=primary?`العامل الأكثر تأثيرًا: ${primary.label} (${primary.impact.toFixed(2)})${primary.evidence?` — ${primary.evidence}`:''}`:'لا توجد عوامل كافية لتحديد سبب رئيسي';return{primary,ranked,totalImpact,explanation};}

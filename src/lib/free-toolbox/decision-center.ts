@@ -1,0 +1,5 @@
+import type {DecisionItem} from './decision-priority';
+export interface DecisionContext{inventory?:number;cashGap?:number;forecastGrowth?:number;customerDrop?:number;stockoutDays?:number|null;}
+export interface DecisionCenterItem extends DecisionItem{domain:'inventory'|'cash'|'sales'|'customer'|'forecast';impact:number;urgency:number;confidence:number;}
+const clamp=(n:number)=>Math.max(0,Math.min(100,n));
+export function buildDecisionCenter(items:DecisionItem[],ctx:DecisionContext={}):DecisionCenterItem[]{return items.map((x,i)=>{const domain:DecisionCenterItem['domain']=x.type.includes('stock')||x.type.includes('reorder')?'inventory':x.type.includes('cash')||x.type.includes('liabil')?'cash':x.type.includes('customer')?'customer':x.type.includes('forecast')?'forecast':'sales';const urgency=clamp(x.score+(ctx.stockoutDays!=null&&ctx.stockoutDays<=3?15:0));const impact=clamp(x.score+(ctx.cashGap&&ctx.cashGap>0?10:0));const confidence=clamp(100-i*3);return{...x,domain,impact,urgency,confidence};}).sort((a,b)=>(b.urgency+b.impact)-(a.urgency+a.impact));}

@@ -1,0 +1,6 @@
+export type AlertSeverity='info'|'watch'|'warning'|'critical';
+export interface AlertSignal{id:string;label:string;value:number;history:number[];direction:'higher-risk'|'lower-risk';staticThreshold?:number}
+export interface AdaptiveAlert{signalId:string;label:string;severity:AlertSeverity;value:number;baseline:number;threshold:number;zScore:number;reason:string}
+const mean=(a:number[])=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0;const std=(a:number[],m:number)=>Math.sqrt(a.length?a.reduce((s,v)=>s+(v-m)**2,0)/a.length:0);
+export function evaluateAdaptiveAlert(s:AlertSignal):AdaptiveAlert{const baseline=mean(s.history);const deviation=std(s.history,baseline);const z=deviation?Math.abs(s.value-baseline)/deviation:0;const threshold=s.staticThreshold??(baseline+(s.direction==='higher-risk'?2:-2)*deviation);const breached=s.direction==='higher-risk'?s.value>threshold:s.value<threshold;const severity:AlertSeverity=!breached?'info':z>=4?'critical':z>=3?'warning':'watch';return{signalId:s.id,label:s.label,severity,value:s.value,baseline,threshold,zScore:z,reason:breached?'القيمة الحالية خرجت عن النطاق السلوكي المتوقع':'القيمة ضمن النطاق المتوقع'}}
+export function evaluateAlerts(signals:AlertSignal[]):AdaptiveAlert[]{return signals.map(evaluateAdaptiveAlert).sort((a,b)=>b.zScore-a.zScore)}

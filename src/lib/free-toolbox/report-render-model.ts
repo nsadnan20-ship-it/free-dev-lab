@@ -1,0 +1,6 @@
+import type {ExecutiveReport,ReportAction,ReportMetric} from './report-contract';
+import type {PlannedAction} from './action-planner';
+import type {Alert} from './alert-engine';
+export interface RenderSection{key:string;title:string;priority:number;metrics:ReportMetric[];actions:ReportAction[];alerts:Alert[]}
+export interface RenderModel{title:string;generatedAt:string;healthScore:number;dataQuality:number;sections:RenderSection[];totalActions:number;criticalAlerts:number}
+export function buildRenderModel(report:ExecutiveReport,planned:PlannedAction[]=[],alerts:Alert[]=[]):RenderModel{const domains=['inventory','cash','sales','customer','supplier','data'];const sections=domains.map((domain,i)=>({key:domain,title:domain,priority:i+1,metrics:report.metrics.filter(m=>m.key.startsWith(domain+'.')||m.key===domain),actions:planned.filter(a=>a.domain===domain).map(a=>({id:`${domain}-${a.title}`,title:a.title,reason:a.reason,priority:a.priority,impact:a.impact,confidence:a.confidence,evidenceIds:a.evidenceIds})),alerts:alerts.filter(a=>a.domain===domain)})).filter(s=>s.metrics.length||s.actions.length||s.alerts.length);return{title:report.title,generatedAt:report.generatedAt,healthScore:report.healthScore,dataQuality:report.dataQuality,sections,totalActions:planned.length,criticalAlerts:alerts.filter(a=>a.severity==='critical').length};}

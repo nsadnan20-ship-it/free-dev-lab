@@ -1,0 +1,5 @@
+export interface ProductCandidate {id:string;name:string;unit?:string;brand?:string;sizeValue?:number;sizeUnit?:string;category?:string;}
+export interface FamilySuggestion {familyKey:string;productIds:string[];score:number;reasons:string[];needsReview:boolean;}
+const n=(s='')=>s.toLowerCase().normalize('NFKC').replace(/[ً-ٟ]/g,'').replace(/[\s_\-./\\]+/g,' ').trim();
+const sizeKey=(p:ProductCandidate)=>p.sizeValue&&p.sizeUnit?`${p.sizeValue}${n(p.sizeUnit)}`:'';
+export function suggestProductFamilies(products:ProductCandidate[]):FamilySuggestion[]{const buckets=new Map<string,ProductCandidate[]>();for(const p of products){const key=[n(p.category),sizeKey(p),n(p.unit)].filter(Boolean).join('|');if(!key)continue;const a=buckets.get(key)??[];a.push(p);buckets.set(key,a);}return [...buckets.entries()].filter(([,ps])=>ps.length>1).map(([key,ps])=>{const sameBrand=new Set(ps.map(p=>n(p.brand))).size===1&&Boolean(ps[0].brand);const score=Math.min(.99,.72+(sameBrand?.18:0));return {familyKey:key,productIds:ps.map(p=>p.id),score,reasons:['same normalized category/size/unit',...(sameBrand?['same brand']:[])],needsReview:score<.9};});}

@@ -1,0 +1,4 @@
+import {buildCashCrisisPlan,type CrisisInput,type CashPlan} from './cash-flow-crisis';
+export interface CashScenario{name:string;balanceAdjustment:number;inflowFactor:number;outflowFactor:number;}
+export interface ScenarioResult{name:string;minimumBalance:number;worstRisk:number;firstRiskDate:string|null;plan:CashPlan[];}
+export function compareCashScenarios(input:CrisisInput,scenarios:CashScenario[]):ScenarioResult[]{return scenarios.map(s=>{const events=input.events.map(e=>({...e,amount:Math.max(0,e.amount*(e.kind==='inflow'?s.inflowFactor:s.outflowFactor))}));const plan=buildCashCrisisPlan({...input,openingBalance:input.openingBalance+s.balanceAdjustment,events});const min=Math.min(...plan.map(x=>x.balance));const worst=Math.max(...plan.map(x=>x.risk));const first=plan.find(x=>x.risk>0)?.date??null;return{name:s.name,minimumBalance:min,worstRisk:worst,firstRiskDate:first,plan};}).sort((a,b)=>a.worstRisk-b.worstRisk);}

@@ -1,0 +1,4 @@
+export interface DriverNode{key:string;label:string;value:number;weight:number;direction:'positive'|'negative'|'neutral';children?:DriverNode[]}
+export interface DriverContribution{key:string;label:string;contribution:number;path:string[]}
+export function flattenDriverTree(root:DriverNode):DriverContribution[]{const out:DriverContribution[]=[];const walk=(n:DriverNode,path:string[],parentWeight=1)=>{const contribution=n.value*n.weight*parentWeight;out.push({key:n.key,label:n.label,contribution,path:[...path,n.label]});for(const c of n.children??[])walk(c,[...path,n.label],parentWeight*n.weight);};walk(root,[]);return out.sort((a,b)=>Math.abs(b.contribution)-Math.abs(a.contribution));}
+export function topDrivers(root:DriverNode,limit=5){return flattenDriverTree(root).slice(0,Math.max(1,limit));}

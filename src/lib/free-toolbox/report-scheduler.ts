@@ -1,0 +1,4 @@
+export type ScheduleFrequency='daily'|'weekly'|'monthly';
+export interface ReportSchedule{id:string;reportTemplateId:string;frequency:ScheduleFrequency;hour:number;minute:number;enabled:boolean;recipients:string[];timezone:string;nextRunAt:string}
+export function nextRun(schedule:Pick<ReportSchedule,'frequency'|'hour'|'minute'|'timezone'>,from=new Date()):Date{const d=new Date(from);d.setSeconds(0,0);d.setHours(schedule.hour,schedule.minute,0,0);if(schedule.frequency==='daily'){if(d<=from)d.setDate(d.getDate()+1)}else if(schedule.frequency==='weekly'){const days=(7+d.getDay()-1)%7;d.setDate(d.getDate()+days);if(d<=from)d.setDate(d.getDate()+7)}else{d.setMonth(d.getMonth()+1,1)}return d}
+export function dueSchedules(schedules:ReportSchedule[],now=new Date()):ReportSchedule[]{return schedules.filter(s=>s.enabled&&new Date(s.nextRunAt)<=now)}

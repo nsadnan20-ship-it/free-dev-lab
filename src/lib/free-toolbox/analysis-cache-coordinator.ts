@@ -1,0 +1,4 @@
+import {evaluateCacheFreshness,cacheVersionMatches,type CacheMetadata} from './analysis-cache-policy';
+export interface CacheHandle<T>{get:()=>T|undefined;set:(value:T)=>void;meta:()=>CacheMetadata|undefined}
+export interface CacheRun<T>{value:T;status:'hit'|'recomputed'|'refreshed';freshness:'fresh'|'stale'|'expired'|'missing'}
+export function runCachedAnalysis<T>(cache:CacheHandle<T>|undefined,version:string,compute:()=>T,now=Date.now()):CacheRun<T>{const meta=cache?.meta();if(meta){const f=evaluateCacheFreshness(meta,now);if(f.usable&&cacheVersionMatches(meta,version)){const value=cache?.get();if(value!==undefined)return{value,status:'hit',freshness:f.freshness}}const value=compute();cache?.set(value);return{value,status:'refreshed',freshness:f.freshness}}const value=compute();cache?.set(value);return{value,status:'recomputed',freshness:'missing'}}

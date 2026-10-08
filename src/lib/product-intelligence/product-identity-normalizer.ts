@@ -1,0 +1,6 @@
+export interface NormalizedProductIdentity {original:string;normalized:string;tokens:string[];sizeValue?:number;sizeUnit?:string;canonicalKey:string;}
+const ARABIC_DIGITS='٠١٢٣٤٥٦٧٨٩';
+const normalizeDigits=(s:string)=>s.replace(/[٠-٩]/g,c=>String(ARABIC_DIGITS.indexOf(c))).replace(/[۰-۹]/g,c=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c)));
+const UNIT_MAP:Record<string,string>={لتر:'l',litre:'l',liter:'l',liters:'l','ل':'l',مل:'ml','ملي':'ml','كيلو':'kg','كجم':'kg','كغ':'kg',kg:'kg',g:'g',جرام:'g',غرام:'g',جم:'g'};
+const stop=new Set(['صنف','منتج','item','product','رقم','كود']);
+export function normalizeProductIdentity(name:string):NormalizedProductIdentity{let normalized=normalizeDigits(name).toLowerCase().normalize('NFKC').replace(/[ً-ٟ]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/[\-_/.\\]+/g,' ').replace(/\s+/g,' ').trim();let sizeValue:number|undefined;let sizeUnit:string|undefined;const m=normalized.match(/(\d+(?:\.\d+)?)\s*(لتر|ل|ml|مل|كيلو|كجم|كغ|kg|g|جرام|غرام|جم)\b/);if(m){sizeValue=Number(m[1]);sizeUnit=UNIT_MAP[m[2]]??m[2];normalized=normalized.replace(m[0],' ');}const tokens=normalized.split(' ').filter(t=>t&&!stop.has(t));const canonicalKey=[...tokens].sort().join('|')+(sizeValue!==undefined?`|${sizeValue}${sizeUnit}`:'');return {original:name,normalized:tokens.join(' '),tokens,sizeValue,sizeUnit,canonicalKey};}

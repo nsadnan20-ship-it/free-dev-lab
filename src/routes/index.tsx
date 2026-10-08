@@ -1,24 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { LegacyAppHost } from "@/components/LegacyAppHost";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "الأغبري | منصة ذكاء الأعمال والقرار" },
+      { name: "description", content: "الأغبري — حلّل أي ملف أعمال واحصل على تقرير ذكي مدعوم بالأدلة وتوصيات وقرارات." },
+      { property: "og:title", content: "الأغبري | منصة ذكاء الأعمال والقرار" },
+      { property: "og:description", content: "حلّل أي ملف أعمال واحصل على تقرير ذكي مدعوم بالأدلة وتوصيات وقرارات." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: LegacyAppHost,
 });
-
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}

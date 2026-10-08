@@ -1,0 +1,6 @@
+export type FolderFileState='new'|'changed'|'unchanged'|'failed'|'processing'|'processed'|'deleted';
+export interface FolderFileRecord{path:string;fingerprint:string;size:number;modifiedAt:string;state:FolderFileState;lastProcessedAt?:string;lastSuccessfulCheckpoint?:string;error?:string;}
+export interface FolderScanResult{folder:string;scannedAt:string;files:FolderFileRecord[];newFiles:number;changedFiles:number;unchangedFiles:number;failedFiles:number;deletedFiles?:string[];}
+export interface FolderMonitorPolicy{acceptedExtensions:string[];recursive:boolean;pollIntervalMs:number;continueOnError:boolean;processOnlyChangedRows:boolean;maxConcurrentFiles:number;retryLimit:number;}
+export const DEFAULT_FOLDER_POLICY:FolderMonitorPolicy={acceptedExtensions:['.pdf','.xlsx','.xls','.csv','.docx','.doc'],recursive:true,pollIntervalMs:30000,continueOnError:true,processOnlyChangedRows:true,maxConcurrentFiles:2,retryLimit:3};
+export function classifyFolderFile(previous:FolderFileRecord|undefined,current:{path:string;fingerprint:string;size:number;modifiedAt:string}):FolderFileState{if(!previous)return 'new';if(previous.fingerprint===current.fingerprint&&previous.size===current.size&&previous.modifiedAt===current.modifiedAt)return 'unchanged';return 'changed';}

@@ -1,0 +1,3 @@
+export interface DemandObservation{requested:number;fulfilled:number}
+export interface LostSalesEstimate{requested:number;fulfilled:number;lost:number;fillRate:number;lostRate:number;severity:'none'|'low'|'medium'|'high'}
+export function estimateLostSales(rows:DemandObservation[]):LostSalesEstimate{const requested=rows.reduce((s,r)=>s+Math.max(0,r.requested),0);const fulfilled=rows.reduce((s,r)=>s+Math.min(Math.max(0,r.requested),Math.max(0,r.fulfilled)),0);const lost=Math.max(0,requested-fulfilled);const fillRate=requested?fulfilled/requested:1;const lostRate=requested?lost/requested:0;const severity=lostRate===0?'none':lostRate<.1?'low':lostRate<.25?'medium':'high';return{requested,fulfilled,lost,fillRate,lostRate,severity}}
