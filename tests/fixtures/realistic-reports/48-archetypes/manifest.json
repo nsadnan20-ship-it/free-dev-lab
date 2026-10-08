@@ -1,0 +1,297 @@
+{
+  "fixtureType": "synthetic-realistic",
+  "catalogId": "report-intelligence.48",
+  "catalogVersion": "1.0.0",
+  "count": 48,
+  "realSourceProof": "separate-gate",
+  "files": [
+    {
+      "number": 1,
+      "archetypeId": "sales.over-time",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/01-sales-over-time.csv",
+      "rows": 12
+    },
+    {
+      "number": 2,
+      "archetypeId": "sales.invoice-detail",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/02-sales-invoice-detail.csv",
+      "rows": 12
+    },
+    {
+      "number": 3,
+      "archetypeId": "sales.by-customer",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/03-sales-by-customer.csv",
+      "rows": 12
+    },
+    {
+      "number": 4,
+      "archetypeId": "sales.by-customer-month",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/04-sales-by-customer-month.csv",
+      "rows": 12
+    },
+    {
+      "number": 5,
+      "archetypeId": "sales.by-product",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/05-sales-by-product.csv",
+      "rows": 12
+    },
+    {
+      "number": 6,
+      "archetypeId": "sales.by-category-brand",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/06-sales-by-category-brand.csv",
+      "rows": 12
+    },
+    {
+      "number": 7,
+      "archetypeId": "sales.by-branch-warehouse",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/07-sales-by-branch-warehouse.csv",
+      "rows": 12
+    },
+    {
+      "number": 8,
+      "archetypeId": "sales.by-representative",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/08-sales-by-representative.csv",
+      "rows": 12
+    },
+    {
+      "number": 9,
+      "archetypeId": "sales.returns",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/09-sales-returns.csv",
+      "rows": 12
+    },
+    {
+      "number": 10,
+      "archetypeId": "sales.discounts",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/10-sales-discounts.csv",
+      "rows": 12
+    },
+    {
+      "number": 11,
+      "archetypeId": "sales.payment-terms",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/11-sales-payment-terms.csv",
+      "rows": 12
+    },
+    {
+      "number": 12,
+      "archetypeId": "sales.target-vs-actual",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/12-sales-target-vs-actual.csv",
+      "rows": 12
+    },
+    {
+      "number": 13,
+      "archetypeId": "purchases.over-time",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/13-purchases-over-time.csv",
+      "rows": 12
+    },
+    {
+      "number": 14,
+      "archetypeId": "purchases.invoice-detail",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/14-purchases-invoice-detail.csv",
+      "rows": 12
+    },
+    {
+      "number": 15,
+      "archetypeId": "purchases.by-supplier",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/15-purchases-by-supplier.csv",
+      "rows": 12
+    },
+    {
+      "number": 16,
+      "archetypeId": "purchases.by-supplier-month",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/16-purchases-by-supplier-month.csv",
+      "rows": 12
+    },
+    {
+      "number": 17,
+      "archetypeId": "purchases.by-product-category",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/17-purchases-by-product-category.csv",
+      "rows": 12
+    },
+    {
+      "number": 18,
+      "archetypeId": "purchases.price-change",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/18-purchases-price-change.csv",
+      "rows": 12
+    },
+    {
+      "number": 19,
+      "archetypeId": "purchases.returns",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/19-purchases-returns.csv",
+      "rows": 12
+    },
+    {
+      "number": 20,
+      "archetypeId": "purchases.by-branch-warehouse",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/20-purchases-by-branch-warehouse.csv",
+      "rows": 12
+    },
+    {
+      "number": 21,
+      "archetypeId": "purchases.supplier-concentration",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/21-purchases-supplier-concentration.csv",
+      "rows": 12
+    },
+    {
+      "number": 22,
+      "archetypeId": "purchases.supply-cycle",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/22-purchases-supply-cycle.csv",
+      "rows": 12
+    },
+    {
+      "number": 23,
+      "archetypeId": "inventory.balances",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/23-inventory-balances.csv",
+      "rows": 12
+    },
+    {
+      "number": 24,
+      "archetypeId": "inventory.movement-card",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/24-inventory-movement-card.csv",
+      "rows": 12
+    },
+    {
+      "number": 25,
+      "archetypeId": "inventory.aging",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/25-inventory-aging.csv",
+      "rows": 12
+    },
+    {
+      "number": 26,
+      "archetypeId": "inventory.velocity",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/26-inventory-velocity.csv",
+      "rows": 12
+    },
+    {
+      "number": 27,
+      "archetypeId": "inventory.coverage",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/27-inventory-coverage.csv",
+      "rows": 12
+    },
+    {
+      "number": 28,
+      "archetypeId": "inventory.stockout-reorder",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/28-inventory-stockout-reorder.csv",
+      "rows": 12
+    },
+    {
+      "number": 29,
+      "archetypeId": "inventory.valuation",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/29-inventory-valuation.csv",
+      "rows": 12
+    },
+    {
+      "number": 30,
+      "archetypeId": "inventory.location-comparison",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/30-inventory-location-comparison.csv",
+      "rows": 12
+    },
+    {
+      "number": 31,
+      "archetypeId": "inventory.abnormal-adjustments",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/31-inventory-abnormal-adjustments.csv",
+      "rows": 12
+    },
+    {
+      "number": 32,
+      "archetypeId": "inventory.transfers",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/32-inventory-transfers.csv",
+      "rows": 12
+    },
+    {
+      "number": 33,
+      "archetypeId": "customers.activity",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/33-customers-activity.csv",
+      "rows": 12
+    },
+    {
+      "number": 34,
+      "archetypeId": "customers.statement",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/34-customers-statement.csv",
+      "rows": 12
+    },
+    {
+      "number": 35,
+      "archetypeId": "customers.continuity",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/35-customers-continuity.csv",
+      "rows": 12
+    },
+    {
+      "number": 36,
+      "archetypeId": "customers.rfm-abc-xyz",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/36-customers-rfm-abc-xyz.csv",
+      "rows": 12
+    },
+    {
+      "number": 37,
+      "archetypeId": "customers.product-intelligence",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/37-customers-product-intelligence.csv",
+      "rows": 12
+    },
+    {
+      "number": 38,
+      "archetypeId": "suppliers.activity",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/38-suppliers-activity.csv",
+      "rows": 12
+    },
+    {
+      "number": 39,
+      "archetypeId": "suppliers.statement",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/39-suppliers-statement.csv",
+      "rows": 12
+    },
+    {
+      "number": 40,
+      "archetypeId": "suppliers.performance",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/40-suppliers-performance.csv",
+      "rows": 12
+    },
+    {
+      "number": 41,
+      "archetypeId": "finance.cash-bank",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/41-finance-cash-bank.csv",
+      "rows": 12
+    },
+    {
+      "number": 42,
+      "archetypeId": "finance.receivables-aging",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/42-finance-receivables-aging.csv",
+      "rows": 12
+    },
+    {
+      "number": 43,
+      "archetypeId": "finance.payables-aging",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/43-finance-payables-aging.csv",
+      "rows": 12
+    },
+    {
+      "number": 44,
+      "archetypeId": "finance.cashflow-liquidity",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/44-finance-cashflow-liquidity.csv",
+      "rows": 12
+    },
+    {
+      "number": 45,
+      "archetypeId": "finance.profitability",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/45-finance-profitability.csv",
+      "rows": 12
+    },
+    {
+      "number": 46,
+      "archetypeId": "finance.general-ledger",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/46-finance-general-ledger.csv",
+      "rows": 12
+    },
+    {
+      "number": 47,
+      "archetypeId": "finance.balance-sheet",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/47-finance-balance-sheet.csv",
+      "rows": 12
+    },
+    {
+      "number": 48,
+      "archetypeId": "demand.forecast",
+      "path": "tests/fixtures/realistic-reports/48-archetypes/48-demand-forecast.csv",
+      "rows": 12
+    }
+  ]
+}
