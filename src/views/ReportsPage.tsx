@@ -248,9 +248,10 @@ export function ReportsCenterPage() {
   const persistedSmartJobId = typeof window !== 'undefined'
     ? window.sessionStorage.getItem('aghbari:last-smart-report-job')?.trim() ?? ''
     : '';
-  const firstSmartReport = (persistedSmartJobId
-    ? smartReports.find((report) => report.jobId === persistedSmartJobId) ?? null
-    : null) ?? smartReports[0] ?? null;
+  const persistedSmartReport = persistedSmartJobId
+    ? smartReports.find((report) => report.jobId === persistedSmartJobId)
+    : undefined;
+  const firstSmartReport = persistedSmartReport ?? smartReports[0] ?? null;
   const kpis = snapshot?.kpis ?? null;
   const aging = snapshot?.aging ?? null;
   const asOf = snapshot?.asOf ?? null;
