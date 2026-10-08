@@ -5,7 +5,7 @@ import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { PageHeader, LoadingState, ErrorState, EmptyState } from '@/components/ui/States';
 import { DataTable, type Column } from '@/components/ui/DataTable';
-import { fetchSuppliersPage, type SupplierRow } from '@/lib/queries';
+import { fetchSuppliersPage, type SupplierRow } from '@/lib/queries-compat';
 
 const PAGE_SIZE = 50;
 

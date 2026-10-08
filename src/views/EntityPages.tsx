@@ -7,7 +7,7 @@ import { EmptyState, PageHeader, LoadingState, ErrorState, DataUnavailableState 
 import { DataTable } from '@/components/ui/DataTable';
 import { CustomerCreateDialog } from '@/components/CustomerCreateDialog';
 import { ProductCreateDialog } from '@/components/ProductCreateDialog';
-import { fetchCustomersPage, fetchProductsPage } from '@/lib/queries';
+import { fetchCustomersPage, fetchProductsPage } from '@/lib/queries-compat';
 import { fetchInventoryReportSnapshot, type InventoryReportRow } from '@/lib/dashboard-canonical';
 import { formatCurrency, formatNumber } from '@/lib/format';
 import type { Customer, Product } from '@/lib/types';

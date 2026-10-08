@@ -5,7 +5,7 @@ import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Link, useSearchParams } from '@/lib/router-compat';
 import { DataTable } from '@/components/ui/DataTable';
 import { EmptyState, ErrorState, LoadingState, PageHeader } from '@/components/ui/States';
-import { fetchImportRecords, fetchWorkerHealthSnapshot, type WorkerHealthSnapshot } from '@/lib/queries';
+import { fetchImportRecords, fetchWorkerHealthSnapshot, type WorkerHealthSnapshot } from '@/lib/queries-compat';
 import { fetchDecisionWorkItems, startSourceDecisionWorkItem, completeSourceDecisionWorkItem, type DecisionWorkItemRecord } from '@/lib/report-decisions';
 import { loadPersistedOutcomes, type DecisionOutcome } from '@/lib/analytics/outcome-feedback';
 import { resolveCurrentCompanyId } from '@/lib/supabase';

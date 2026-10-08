@@ -9,7 +9,7 @@ import { Link, useSearchParams } from '@/lib/router-compat';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ConfidenceBadge, PriorityBadge, SeverityBadge } from '@/components/ui/Badge';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
-import { fetchAlerts, fetchRecommendations } from '@/lib/queries';
+import { fetchAlerts, fetchRecommendations } from '@/lib/queries-compat';
 import { fetchSmartReport, type SmartReportDetail } from '@/lib/report-smart';
 import { selectExecutiveRecommendation, selectExecutiveSignal } from '@/lib/report-intelligence/report-smart-insights';
 import { createSourceDecisionProposal, fetchDecisionWorkItems, fetchSourceDecisionProposals, type DecisionWorkItemRecord } from '@/lib/report-decisions';

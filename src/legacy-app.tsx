@@ -9,7 +9,7 @@ import { ProductJourneyNav } from '@/components/ProductJourneyNav';
 import { DeterministicIntelligenceAssistant } from '@/components/DeterministicIntelligenceAssistant';
 import { DashboardPage } from '@/views/DashboardPage';
 const ScenarioTruthGuardPage = lazy(() => import('@/views/ScenarioTruthGuardPage').then(m => ({ default: m.ScenarioTruthGuardPage })));
-import { markAlertRead } from '@/lib/queries';
+import { markAlertRead } from '@/lib/queries-compat';
 import { fetchDashboardIntelligence } from '@/lib/dashboard-canonical';
 import { getAuthenticatedUser } from '@/lib/auth-session';
 import type { Alert } from '@/lib/types';

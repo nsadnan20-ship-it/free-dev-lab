@@ -14,7 +14,7 @@ import {
   fetchAlerts,
   fetchForecasts,
   updateRecommendationStatus,
-} from '@/lib/queries';
+} from '@/lib/queries-compat';
 import { formatCurrency, relativeTime } from '@/lib/format';
 import type { Recommendation, Alert, Forecast } from '@/lib/types';
 import { fetchSmartReport, type SmartReportDetail } from '@/lib/report-smart';
