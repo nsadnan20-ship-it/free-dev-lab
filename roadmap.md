@@ -5,3 +5,5 @@
 - [ ] Enable Lovable Cloud and replay the 319 database migrations (login, saving reports, decisions, work items) — waits on user go-ahead
 - [ ] Port contract tests (*.test.ts) and re-run them
 - [ ] Verify full journey on a real file: upload → smart report → recommendation → decision → work → outcome
+- [x] Full status study + report (done / missing / to build) against the vision spec
+- [ ] Vision spec: auth + per-company isolation, saved smart reports reopenable after refresh, export, audit log, learning from outcomes — after Cloud
