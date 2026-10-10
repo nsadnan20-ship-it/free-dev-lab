@@ -1,31 +1,13 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { supabase as cloudClient } from '@/integrations/supabase/client';
 
 /**
- * Public/demo routes must be renderable without database credentials.
- * Protected data access still requires the real environment variables; the
- * placeholder client only prevents module evaluation from blanking the whole
- * application before a protected route can establish its auth boundary.
+ * Canonical browser client: the single Lovable Cloud client (one auth session).
+ * Exposed untyped because the imported screens were written against the
+ * original untyped client. RLS and current_company_id() remain the security boundary.
  */
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
-const browserSupabaseUrl = supabaseUrl || 'https://placeholder.invalid';
-const browserSupabaseAnonKey = supabaseAnonKey || 'placeholder-anon-key';
-
-/**
- * Canonical browser client.
- * Session persistence is enabled so authenticated tenant membership can be
- * resolved consistently across navigation/reloads. RLS and the database
- * current_company_id() resolver remain the authoritative security boundary.
- */
-export const supabase = createClient(browserSupabaseUrl, browserSupabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
-});
+export const isSupabaseConfigured = Boolean(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
+export const supabase = cloudClient as unknown as SupabaseClient;
 
 /**
  * Resolve the authenticated user's tenant exclusively through the database
