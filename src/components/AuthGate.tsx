@@ -10,6 +10,33 @@ interface AuthGateProps { children?: ReactNode; }
 type GateState = 'checking' | 'ready' | 'unauthenticated' | 'tenant-missing';
 type TenantBlockingReason = 'NO_MEMBERSHIP' | 'TENANT_CONTEXT_UNRESOLVED';
 
+function CreateCompanyForm({ onCreated }: { onCreated: () => void }) {
+  const [name, setName] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    const { error: rpcError } = await supabase.rpc('create_my_company', { p_name: name });
+    setBusy(false);
+    if (rpcError) {
+      const msg = rpcError.message ?? '';
+      setError(msg.includes('COMPANY_NAME_INVALID') ? 'اكتب اسمًا للشركة من حرفين إلى 120 حرفًا.' : msg.includes('COMPANY_ALREADY_EXISTS') ? 'حسابك مرتبط بشركة بالفعل. اضغط «إعادة فحص العضوية».' : 'تعذر إنشاء الشركة الآن. أعد المحاولة.');
+      return;
+    }
+    onCreated();
+  };
+  return (
+    <form onSubmit={submit} className="mt-3 flex flex-col gap-2 sm:flex-row">
+      <label htmlFor="company-name" className="sr-only">اسم الشركة</label>
+      <input id="company-name" required minLength={2} maxLength={120} value={name} onChange={e => setName(e.target.value)} placeholder="اسم الشركة" className="input min-h-11 flex-1" />
+      <button type="submit" disabled={busy} className="btn-primary min-h-11">{busy ? 'جارٍ الإنشاء…' : 'إنشاء مساحة الشركة'}</button>
+      {error && <p role="alert" className="text-xs font-bold text-danger-700 sm:basis-full">{error}</p>}
+    </form>
+  );
+}
+
 const TENANT_RETRY_COUNT = 6;
 const TENANT_RETRY_DELAY_MS = 400;
 
@@ -97,11 +124,11 @@ function TenantMissingState({
               <div className="min-w-0 flex-1">
                 <h2 className="text-sm font-black text-primary-900">ما الذي يجب فعله الآن؟</h2>
                 {noMembership ? (
-                  <ol className="mt-2 space-y-2 text-xs leading-6 text-primary-900/75">
-                    <li><strong>1.</strong> اطلب من مالك/مدير الشركة إضافتك كعضو في الشركة الصحيحة.</li>
-                    <li><strong>2.</strong> استخدم نفس بريد الحساب أدناه عند إرسال الدعوة.</li>
-                    <li><strong>3.</strong> بعد قبول الدعوة اضغط «إعادة فحص العضوية» هنا.</li>
-                  </ol>
+                  <>
+                    <p className="mt-2 text-xs leading-6 text-primary-900/75">أنشئ مساحة شركتك الآن، وستكون أنت مالكها. لا يرى بياناتها إلا أعضاؤها.</p>
+                    <CreateCompanyForm onCreated={onRetry} />
+                    <p className="mt-3 text-[11px] leading-5 text-primary-900/60">إذا كانت شركتك موجودة مسبقًا، اطلب من مالكها إضافتك ببريدك أدناه بدل إنشاء شركة جديدة.</p>
+                  </>
                 ) : (
                   <ol className="mt-2 space-y-2 text-xs leading-6 text-primary-900/75">
                     <li><strong>1.</strong> أعد تسجيل الدخول إذا كانت العضوية أُضيفت حديثًا أو تغيّر سياق الحساب.</li>
