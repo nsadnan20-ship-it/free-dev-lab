@@ -7065,6 +7065,7 @@ export type Database = {
         }
         Returns: string
       }
+      create_my_company: { Args: { p_name: string }; Returns: string }
       create_runtime_decision: {
         Args: {
           p_confidence: number
