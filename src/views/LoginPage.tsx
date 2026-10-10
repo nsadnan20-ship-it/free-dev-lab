@@ -32,11 +32,32 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [notice, setNotice] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+    setNotice(null);
     setSubmitting(true);
+    if (mode === 'signup') {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: { emailRedirectTo: window.location.origin },
+      });
+      if (signUpError) {
+        const message = String(signUpError.message ?? '').toLowerCase();
+        if (message.includes('already')) setError('هذا البريد مسجل مسبقًا. استخدم تسجيل الدخول.');
+        else if (message.includes('password')) setError('كلمة المرور ضعيفة. استخدم 8 أحرف على الأقل مع أرقام وحروف.');
+        else setError('تعذر إنشاء الحساب الآن. أعد المحاولة بعد قليل.');
+      } else if (!data.session) {
+        setNotice('تم إنشاء الحساب. افتح الرسالة المرسلة إلى بريدك واضغط رابط التأكيد، ثم سجّل الدخول.');
+        setMode('signin');
+      }
+      setSubmitting(false);
+      return;
+    }
     const { error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     if (signInError) {
       const code = String(signInError.code ?? '').toLowerCase();
@@ -133,13 +154,18 @@ export function LoginPage() {
             <div className="mb-7 lg:hidden"><div className="flex items-center justify-between"><div className="flex items-center gap-3"><div className="flex h-9 w-9 items-center justify-center rounded-[9px] bg-ink-950 text-sm font-black text-white">أ</div><div><div className="text-[14px] font-black">الأغبري</div><div className="text-[10px] text-ink-400">مساحة العمل</div></div></div><LanguageToggle/></div></div>
             <div className="rounded-[14px] border border-ink-200 bg-white p-6 shadow-card sm:p-7">
               <div className="flex h-10 w-10 items-center justify-center rounded-[9px] bg-primary-50 text-primary-700"><LogIn size={18}/></div>
-              <h2 className="mt-5 text-[24px] font-black tracking-tight text-ink-950">الدخول إلى مساحة العمل</h2>
-              <p className="mt-2 text-[12px] leading-6 text-ink-500">حسابك يحدد الشركة والصلاحيات والمساحة التي ستراها بعد التحقق.</p>
-              <form onSubmit={handleSubmit} className="mt-7 space-y-4">
+              <h2 className="mt-5 text-[24px] font-black tracking-tight text-ink-950">{mode === 'signup' ? 'إنشاء حساب جديد' : 'الدخول إلى مساحة العمل'}</h2>
+              <p className="mt-2 text-[12px] leading-6 text-ink-500">{mode === 'signup' ? 'أنشئ حسابك مجانًا، ثم أنشئ مساحة شركتك المعزولة.' : 'حسابك يحدد الشركة والصلاحيات والمساحة التي ستراها بعد التحقق.'}</p>
+              <div className="mt-5 grid grid-cols-2 gap-1 rounded-[10px] border border-ink-200 bg-ink-50 p-1" role="tablist" aria-label="نوع العملية">
+                <button type="button" role="tab" aria-selected={mode === 'signin'} onClick={() => { setMode('signin'); setError(null); setNotice(null); }} className={`filter-chip min-h-10 ${mode === 'signin' ? 'filter-chip-active' : ''}`}>تسجيل الدخول</button>
+                <button type="button" role="tab" aria-selected={mode === 'signup'} onClick={() => { setMode('signup'); setError(null); setNotice(null); }} className={`filter-chip min-h-10 ${mode === 'signup' ? 'filter-chip-active' : ''}`}>حساب جديد</button>
+              </div>
+              <form onSubmit={handleSubmit} className="mt-5 space-y-4">
                 <div><label htmlFor="login-email" className="mb-1.5 block text-[12px] font-bold text-ink-700">البريد الإلكتروني</label><input id="login-email" type="email" autoComplete="username" required value={email} onChange={event => setEmail(event.target.value)} className="input min-h-12 text-[16px] lg:text-sm" placeholder="name@company.com" dir="ltr"/></div>
-                <div><label htmlFor="login-password" className="mb-1.5 block text-[12px] font-bold text-ink-700">كلمة المرور</label><input id="login-password" type="password" autoComplete="current-password" required value={password} onChange={event => setPassword(event.target.value)} className="input min-h-12 text-[16px] lg:text-sm" placeholder="••••••••••" dir="ltr"/></div>
+                <div><label htmlFor="login-password" className="mb-1.5 block text-[12px] font-bold text-ink-700">كلمة المرور</label><input id="login-password" type="password" autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} required minLength={mode === 'signup' ? 8 : undefined} value={password} onChange={event => setPassword(event.target.value)} className="input min-h-12 text-[16px] lg:text-sm" placeholder="••••••••••" dir="ltr"/></div>
                 {error && <div role="alert" className="flex items-start gap-2.5 rounded-[10px] border border-danger-200 bg-danger-50 px-3.5 py-3 text-[12px] leading-5 text-danger-700"><AlertCircle size={17} className="mt-0.5 shrink-0"/><span>{error}</span></div>}
-                <button type="submit" disabled={submitting} className="btn-primary min-h-12 w-full justify-center text-[13px]">{submitting ? <Loader2 size={17} className="animate-spin"/> : <ArrowLeft size={17}/>} {submitting ? 'جارٍ التحقق…' : 'الدخول إلى مساحة العمل'}</button>
+                {notice && <div role="status" className="flex items-start gap-2.5 rounded-[10px] border border-success-200 bg-success-50 px-3.5 py-3 text-[12px] leading-5 text-success-700"><CheckCircle2 size={17} className="mt-0.5 shrink-0"/><span>{notice}</span></div>}
+                <button type="submit" disabled={submitting} className="btn-primary min-h-12 w-full justify-center text-[13px]">{submitting ? <Loader2 size={17} className="animate-spin"/> : <ArrowLeft size={17}/>} {submitting ? 'جارٍ التحقق…' : mode === 'signup' ? 'إنشاء الحساب' : 'الدخول إلى مساحة العمل'}</button>
               </form>
               <div className="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-[9px] border border-ink-200 bg-ink-200"><div className="bg-white px-3 py-2.5 text-center text-[10px] font-semibold text-ink-500">هوية موثقة</div><div className="bg-white px-3 py-2.5 text-center text-[10px] font-semibold text-ink-500">شركة معزولة</div></div>
               <div className="mt-5 grid gap-2 sm:grid-cols-2">
