@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791590624593,
+      "tag": "0000_import_report_advisor_schema",
+      "breakpoints": true
+    }
+  ]
 }
