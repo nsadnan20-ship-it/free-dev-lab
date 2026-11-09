@@ -13,3 +13,5 @@
 - The Report-Advisor workspace (src/legacy-app.tsx, src/views, src/components, src/lib) is imported from GitHub main and runs client-only via src/components/LegacyAppHost.tsx from the `/` and `/$` routes; reuse/fix it rather than rebuilding (no-rebuild policy from the transfer pack).
 - Screens import routing from `@/lib/router-compat`, a local adapter over TanStack Router history; never install react-router-dom.
 - No paid AI services: all analysis is deterministic and in-browser (pdfjs, mammoth, xlsx, tesseract.js) so the app costs nothing to run.
+- Database schema = consolidated final state of the original Report-Advisor repo's 319 migrations, applied via drizzle/migrations/0000 (fetched+verified bundle) plus later additive migrations; Drizzle journal is the source of truth going forward.
+- src/lib/supabase.ts re-exports the generated untyped client from @/integrations/supabase/client; screens stay untyped, safety bound is RLS + current_company_id().
