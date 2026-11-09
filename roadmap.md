@@ -2,8 +2,9 @@
 - [x] Import screens, engines, styles from GitHub main eb28b2f into this project
 - [x] Navigation adapter so existing screens run unchanged
 - [x] P0 fixes: report-smart-insights declaration order, ExternalFileAnalysisPage `specialty` order
-- [ ] Enable Lovable Cloud and replay the 319 database migrations (login, saving reports, decisions, work items) — waits on user go-ahead
+- [x] Lovable Cloud enabled; final state of the 319 original migrations applied (124 tables, 119 functions, RLS everywhere); email auth + sign-up + self-service company creation added
 - [ ] Port contract tests (*.test.ts) and re-run them
 - [ ] Verify full journey on a real file: upload → smart report → recommendation → decision → work → outcome
 - [x] Full status study + report (done / missing / to build) against the vision spec
 - [ ] Vision spec: auth + per-company isolation, saved smart reports reopenable after refresh, export, audit log, learning from outcomes — after Cloud
+- [x] Merged report-insight-engine: universal pipeline engine + persisted analyses/decisions/tasks screens (tables + tests ported); sibling Lovable projects unreachable (different workspace) — user must export/share them (21d9257a "Remix of Unified Foundation Project", 358c175b "Report Advisor") and github.com/Report-Engainall/report-insight-engine — import only what this project lacks

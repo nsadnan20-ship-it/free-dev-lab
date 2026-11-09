@@ -15,6 +15,13 @@
       "when": 1791590689463,
       "tag": "0001_self_service_company_onboarding",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794187167700,
+      "tag": "0002_universal_analysis_tables",
+      "breakpoints": true
     }
   ]
 }

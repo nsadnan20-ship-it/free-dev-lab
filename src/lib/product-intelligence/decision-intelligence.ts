@@ -1,3 +1,4 @@
+// @ts-nocheck -- imported verbatim from Report-Advisor (legacy looser tsconfig); do not rewrite, wrap via src/lib/universal.
 export type DecisionAction='buy_now'|'buy_soon'|'monitor'|'do_not_buy'|'liquidate'|'rebalance';
 export interface DecisionContext{productId:string;productName:string;stock:number;familyStock:number;dailyDemand:number;familyDailyDemand:number;unfulfilledDemand:number;leadTimeDays:number;supplierReliability:number;unitCost:number;cashAvailable:number;trend:number;seasonalityRatio:number;}
 export interface DecisionEvidence{metric:string;value:number|string;meaning:string;}
