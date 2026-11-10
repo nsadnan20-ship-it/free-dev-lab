@@ -3620,6 +3620,7 @@ export type Database = {
           entity_type: string | null
           error_message: string | null
           eta_seconds: number | null
+          file_name: string | null
           file_record_id: string | null
           id: string
           idempotency_key: string | null
@@ -3648,6 +3649,7 @@ export type Database = {
           entity_type?: string | null
           error_message?: string | null
           eta_seconds?: number | null
+          file_name?: string | null
           file_record_id?: string | null
           id?: string
           idempotency_key?: string | null
@@ -3676,6 +3678,7 @@ export type Database = {
           entity_type?: string | null
           error_message?: string | null
           eta_seconds?: number | null
+          file_name?: string | null
           file_record_id?: string | null
           id?: string
           idempotency_key?: string | null
@@ -7512,6 +7515,18 @@ export type Database = {
               p_idempotency_key: string
               p_profile_id: string
               p_source_fingerprint?: string
+              p_total_rows: number
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_company_id: string
+              p_entity_type: string
+              p_file_mime: string
+              p_file_name: string
+              p_file_size: number
+              p_source_object_path: string
               p_total_rows: number
             }
             Returns: string

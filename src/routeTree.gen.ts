@@ -14,6 +14,7 @@ import { Route as SplatRouteImport } from './routes/$'
 import { Route as AnalyzeRouteImport } from './routes/analyze'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as AnalysesIdRouteImport } from './routes/analyses.$id'
+import { Route as ApiCanonicalImportExecuteRouteImport } from './routes/api/canonical-import-execute'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +41,12 @@ const AnalysesIdRoute = AnalysesIdRouteImport.update({
   path: '/analyses/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCanonicalImportExecuteRoute =
+  ApiCanonicalImportExecuteRouteImport.update({
+    id: '/api/canonical-import-execute',
+    path: '/api/canonical-import-execute',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +54,7 @@ export interface FileRoutesByFullPath {
   '/analyze': typeof AnalyzeRoute
   '/tasks': typeof TasksRoute
   '/analyses/$id': typeof AnalysesIdRoute
+  '/api/canonical-import-execute': typeof ApiCanonicalImportExecuteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +62,7 @@ export interface FileRoutesByTo {
   '/analyze': typeof AnalyzeRoute
   '/tasks': typeof TasksRoute
   '/analyses/$id': typeof AnalysesIdRoute
+  '/api/canonical-import-execute': typeof ApiCanonicalImportExecuteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +71,33 @@ export interface FileRoutesById {
   '/analyze': typeof AnalyzeRoute
   '/tasks': typeof TasksRoute
   '/analyses/$id': typeof AnalysesIdRoute
+  '/api/canonical-import-execute': typeof ApiCanonicalImportExecuteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$' | '/analyze' | '/tasks' | '/analyses/$id'
+  fullPaths:
+    | '/'
+    | '/$'
+    | '/analyze'
+    | '/tasks'
+    | '/analyses/$id'
+    | '/api/canonical-import-execute'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$' | '/analyze' | '/tasks' | '/analyses/$id'
-  id: '__root__' | '/' | '/$' | '/analyze' | '/tasks' | '/analyses/$id'
+  to:
+    | '/'
+    | '/$'
+    | '/analyze'
+    | '/tasks'
+    | '/analyses/$id'
+    | '/api/canonical-import-execute'
+  id:
+    | '__root__'
+    | '/'
+    | '/$'
+    | '/analyze'
+    | '/tasks'
+    | '/analyses/$id'
+    | '/api/canonical-import-execute'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +106,7 @@ export interface RootRouteChildren {
   AnalyzeRoute: typeof AnalyzeRoute
   TasksRoute: typeof TasksRoute
   AnalysesIdRoute: typeof AnalysesIdRoute
+  ApiCanonicalImportExecuteRoute: typeof ApiCanonicalImportExecuteRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +146,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnalysesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/canonical-import-execute': {
+      id: '/api/canonical-import-execute'
+      path: '/api/canonical-import-execute'
+      fullPath: '/api/canonical-import-execute'
+      preLoaderRoute: typeof ApiCanonicalImportExecuteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +162,7 @@ const rootRouteChildren: RootRouteChildren = {
   AnalyzeRoute: AnalyzeRoute,
   TasksRoute: TasksRoute,
   AnalysesIdRoute: AnalysesIdRoute,
+  ApiCanonicalImportExecuteRoute: ApiCanonicalImportExecuteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
