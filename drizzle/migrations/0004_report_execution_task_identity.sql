@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS report_execution_tasks_company_job_task_unique ON public.report_execution_tasks(company_id,report_execution_job_id,task_key);

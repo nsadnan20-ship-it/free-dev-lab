@@ -460,6 +460,7 @@ export async function runCanonicalImportThroughDurableRunner(
       `rows:${input.rows.length}`,
     ],
     p_max_attempts: 3,
+    p_force_reprocess: input.repairExistingSource === true,
   };
   if (input.repairExistingSource === true) {
     enqueueArgs.p_force_reprocess = true;

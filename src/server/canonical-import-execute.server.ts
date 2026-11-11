@@ -158,10 +158,16 @@ async function authoritativeSourceInput(args: {
       detected_format: detection.format,
       security_status: 'passed',
       status: 'ready',
+      metadata: { ...metadata, raw_bytes_sha256: sourceHash },
     })
     .eq('id', fileRecord.id)
     .eq('company_id', companyId);
   if (fileUpdateError) throw new Error('AUTHORITATIVE_SOURCE_FILE_RECORD_UPDATE_FAILED:' + fileUpdateError.message);
+
+  const { error: identityError } = await workerClient.from('import_jobs')
+    .update({ source_fingerprint: sourceHash, job_type: entityType })
+    .eq('id', importId).eq('company_id', companyId);
+  if (identityError) throw new Error('AUTHORITATIVE_SOURCE_IDENTITY_UPDATE_FAILED:' + identityError.message);
 
   return {
     importId,
@@ -180,6 +186,13 @@ function validateInput(value: unknown): Record<string, unknown> {
 
 function json(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
+}
+
+function executionErrorMessage(error: unknown): string {
+  if (error instanceof AggregateError) return error.errors.map(executionErrorMessage).join(' | ');
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === 'object' && 'message' in error) return String(error.message);
+  return String(error);
 }
 
 export async function handleCanonicalImportExecute(req: Request): Promise<Response> {
@@ -330,7 +343,7 @@ export async function handleCanonicalImportExecute(req: Request): Promise<Respon
 
     const result = await runCanonicalImportThroughDurableRunner(input, {
       serverExecution: true,
-      workerClient,
+      workerClient: dataClient,
       dataClient,
       companyId,
       requestedBy: user.id,
@@ -338,7 +351,7 @@ export async function handleCanonicalImportExecute(req: Request): Promise<Respon
 
     return json(200, result);
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    const message = executionErrorMessage(error);
     const status =
       /required|invalid|tenant|hash|rows|quality|business|duplicate|already_completed|already_running|not_retryable/i.test(message) ? 400 : 502;
     return json(status, { status: 'failed', error: message.slice(0, 512) });

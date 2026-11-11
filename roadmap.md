@@ -1,4 +1,7 @@
 # Report-Advisor migration roadmap
+- [ ] Repair upload → analysis → approval → reopen flow and verify with signed-in reports.
+- [ ] Analyze every report page/sheet without silently selecting only the first dataset; add regression tests.
+- [ ] Improve import and report screens with real source coverage, findings, evidence and actionable alerts.
 - [x] Import screens, engines, styles from GitHub main eb28b2f into this project
 - [x] Navigation adapter so existing screens run unchanged
 - [x] P0 fixes: report-smart-insights declaration order, ExternalFileAnalysisPage `specialty` order
