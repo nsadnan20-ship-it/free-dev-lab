@@ -15,6 +15,7 @@ import { BusinessDataExplorer } from '@/components/SourceBoundReportSurface';
 import { UniversalIntelligenceChain } from '@/components/UniversalIntelligenceChain';
 import { GenericFileIntelligenceCard } from '@/components/GenericFileIntelligenceCard';
 import { buildUniversalReportIntelligence } from '@/lib/universal-report-intelligence';
+import { SourceValueBrief, type BriefSource } from '@/components/SourceValueBrief';
 
 function textValue(value: unknown): string {
   if (value == null || value === '') return 'غير متاح';
@@ -808,6 +809,16 @@ export function SmartReportPage() {
   };
 
   const smartAnalysis = useMemo(() => buildSmartAnalysis(report), [report]);
+  const briefSources = useMemo(() => {
+    const groups = new Map<string, BriefSource>();
+    for (const row of report?.canonicalRows ?? []) {
+      const name = String(row.data._source_sheet ?? report?.sourcePath ?? 'المصدر');
+      const group = groups.get(name) ?? { name, rows: [] };
+      group.rows.push(row.data);
+      groups.set(name, group);
+    }
+    return [...groups.values()];
+  }, [report]);
   const universalIntelligence = useMemo(() => report ? buildUniversalReportIntelligence({
     specialty: report.specialty,
     rowCount: report.rowCount,
@@ -919,7 +930,8 @@ export function SmartReportPage() {
       </div>}
     />
 
-    <section id="executive-layer" className="executive-hero rounded-[24px] border border-slate-700/70 bg-[linear-gradient(135deg,#0b1020_0%,#111827_58%,#15111f_100%)] p-5 text-white shadow-[0_28px_80px_-38px_rgba(15,23,42,.9)] lg:p-7">
+    <SourceValueBrief sources={briefSources}/>
+    <section id="executive-layer" className="executive-hero rounded-lg border border-border bg-card p-5 text-card-foreground shadow-card lg:p-7">
       <div className="grid gap-5 xl:grid-cols-[1.25fr_.75fr]">
         <div>
           <div className="flex flex-wrap items-center gap-2">

@@ -231,3 +231,22 @@
 
 
 }
+
+/* The legacy cascade painted a light executive surface over light text. Keep
+   report evidence readable regardless of section order or legacy overrides. */
+.ag-main .ag-smart-report-surface #executive-layer {
+  background: var(--card) !important;
+  color: var(--card-foreground) !important;
+  border-color: var(--border) !important;
+  min-height: 0 !important;
+}
+.ag-main .ag-smart-report-surface #executive-layer :is(h2, .text-white) {
+  color: var(--card-foreground) !important;
+}
+.ag-main .ag-smart-report-surface #executive-layer :is(.text-slate-300, .text-slate-400) {
+  color: var(--muted-foreground) !important;
+}
+.ag-main .ag-smart-report-surface #executive-layer .ag-report-hero-stat {
+  background: var(--muted) !important;
+  border-color: var(--border) !important;
+}

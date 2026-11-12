@@ -271,7 +271,7 @@ function extractArabicSalesTableFromPage(
   for (const tokens of lines) {
     if (!tokens.length) continue;
     const lineY = median(tokens.map((token) => token.y));
-    if (lineY < 130 || lineY > Math.max(540, (page.pageHeight ?? 595) - 35)) continue;
+    if (lineY < (findArabicSalesHeader(page) ? 130 : 20) || lineY > Math.max(540, (page.pageHeight ?? 595) - 35)) continue;
 
     const cells: PdfTextToken[][] = Array.from({ length: bands.length }, () => []);
     for (const token of tokens) {
@@ -308,6 +308,7 @@ function extractArabicSalesTableFromPage(
     row.invoice_type = invoiceType;
     row.customer_name = values[6] || null;
     row.currency = values[7] || null;
+    row.page_number = page.pageNumber;
     rows.push(row);
   }
   return rows;
@@ -319,7 +320,7 @@ export function extractArabicSalesTable(
   const targetPages = pages.filter(findArabicSalesHeader);
   if (!targetPages.length) return null;
 
-  const rows = targetPages.flatMap((page) =>
+  const rows = pages.filter((page) => page.pageNumber >= targetPages[0].pageNumber).flatMap((page) =>
     extractArabicSalesTableFromPage(
       page,
       scaledArabicSalesBands(page.pageWidth ?? 841.92),

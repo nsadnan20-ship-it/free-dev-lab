@@ -15,3 +15,5 @@
 - No paid AI services: all analysis is deterministic and in-browser (pdfjs, mammoth, xlsx, tesseract.js) so the app costs nothing to run.
 - Database schema = consolidated final state of the original Report-Advisor repo's 319 migrations, applied via drizzle/migrations/0000 (fetched+verified bundle) plus later additive migrations; Drizzle journal is the source of truth going forward.
 - src/lib/supabase.ts re-exports the generated untyped client from @/integrations/supabase/client; screens stay untyped, safety bound is RLS + current_company_id().
+- Full-source extraction retains every dataset with sheet and row provenance; advisory totals are computed per dataset to avoid mixing unrelated tables.
+- Import approval re-reads stored bytes and records the raw SHA-256 proof before commit; durable execution uses the verified user's client so tenant permissions remain enforced.

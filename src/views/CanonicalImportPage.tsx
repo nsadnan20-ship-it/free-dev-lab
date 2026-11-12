@@ -14,6 +14,8 @@ import { parseFile } from '@/lib/file-engine/adapters';
 import { FORMAT_LABELS, MAX_FILE_SIZE, type FileFormat, type Dataset } from '@/lib/file-engine/types';
 import { reconcileForCanonical } from '@/lib/import/canonical-truth-boundary';
 import { runCanonicalImportThroughDurableRunner } from '@/lib/import/canonical-production-adapter';
+import { combineSourceDatasets } from '@/lib/file-engine/full-source';
+import { SourceValueBrief } from '@/components/SourceValueBrief';
 
 type Step = 'upload' | 'scanning' | 'preview' | 'saving' | 'done';
 interface Row { rowNumber: number; data: Record<string, any>; valid: boolean; error?: string }
@@ -129,6 +131,7 @@ export function CanonicalImportPage() {
   const [file, setFile] = useState<{ name: string; size: number; format: FileFormat; mime: string } | null>(null);
   const [fileHash, setFileHash] = useState<string | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
+  const [sourceDatasets, setSourceDatasets] = useState<Dataset[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
   const [quality, setQuality] = useState(0);
   const [qualityApproved, setQualityApproved] = useState(false);
@@ -206,7 +209,8 @@ export function CanonicalImportPage() {
         }
       }
       const datasets: Dataset[] = await parseFile(buffer, selected.name, detection.format);
-      const dataset = datasets[0];
+      const dataset = await combineSourceDatasets(datasets);
+      setSourceDatasets(datasets);
       if (!dataset || dataset.rowCount === 0) throw new Error('الملف فارغ أو لا يحتوي على بيانات قابلة للقراءة');
       const analyticalReportQuality = deriveAnalyticalReportQuality(dataset, detection.format, selected.name);
       const effectiveQuality = Math.max(Number(dataset.qualityScore) || 0, analyticalReportQuality);
@@ -527,6 +531,7 @@ export function CanonicalImportPage() {
         </CardBody>
       </Card>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3"><Card><CardBody><div className="text-xs text-ink-400">إجمالي الصفوف</div><div className="text-xl font-bold mt-1">{formatNumber(rows.length)}</div></CardBody></Card><Card><CardBody><div className="text-xs text-ink-400">جاهز للتحليل</div><div className="text-xl font-bold mt-1 text-success-600">{formatNumber(valid)}</div></CardBody></Card><Card><CardBody><div className="text-xs text-ink-400">تحتاج مراجعة</div><div className="text-xl font-bold mt-1 text-danger-600">{formatNumber(invalid)}</div></CardBody></Card><Card><CardBody><div className="text-xs text-ink-400">حالة التكرار</div><div className={`text-sm font-semibold mt-2 ${duplicate ? 'text-danger-600' : 'text-success-600'}`}>{duplicate ? 'مكرر — محظور' : 'لا يوجد تكرار'}</div></CardBody></Card></div>
+      <SourceValueBrief sources={sourceDatasets.map((d) => ({ name: d.sheet ?? d.name, rows: d.rows }))}/>
       {warnings.length>0 && <div className="space-y-2">{warnings.map((w,i)=><div key={i} className="p-3 rounded-lg bg-warning-50 text-warning-700 text-sm flex gap-2"><AlertTriangle size={16}/>{w}</div>)}</div>}
       {duplicate && <div className="p-4 rounded-xl border border-danger-200 bg-danger-50 text-danger-700 text-sm flex items-start gap-3"><XCircle size={18}/><div><b>الكتابة متوقفة لحماية البيانات.</b><div className="mt-1">تم اكتشاف بصمة ملف مطابقة داخل حسابك. لن يتم حفظ نسخة تحليل مكررة؛ أعد تصدير الملف أو استخدم مصدرًا جديدًا بدل إنشاء نسخة مكررة.</div></div></div>}
       {quality >= 50 && quality < 75 && !duplicate && <label className="p-4 rounded-xl border border-warning-200 bg-warning-50 text-warning-800 text-sm flex items-start gap-3 cursor-pointer"><input type="checkbox" checked={qualityApproved} onChange={e => setQualityApproved(e.target.checked)} className="mt-1"/><span><b>موافقة جودة صريحة:</b> الجودة {quality}% تقع في نطاق المراجعة (50–74%) ويجب تأكيدك قبل الكتابة.</span></label>}

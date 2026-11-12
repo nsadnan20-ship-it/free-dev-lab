@@ -9,6 +9,7 @@ import { detectFormat } from '@/lib/file-engine/detector';
 import { securityScan } from '@/lib/file-engine/security';
 import { computeSHA256 } from '@/lib/file-engine/file-identity-core';
 import { reconcileForCanonical } from '@/lib/import/canonical-truth-boundary';
+import { combineSourceDatasets } from '@/lib/file-engine/full-source';
 function reportEntityTypeFromJobKey(jobKey: string): CanonicalImportEntityType {
   const parts = jobKey.split(':');
   if (parts[0] !== 'canonical-import') throw new Error('REPORT_EXECUTION_JOB_KEY_INVALID');
@@ -93,7 +94,7 @@ async function authoritativeSourceInput(args: {
   if (detection.format === 'unknown') throw new Error('AUTHORITATIVE_SOURCE_FORMAT_UNKNOWN');
 
   const datasets = await parseFile(buffer, fileName, detection.format);
-  const dataset = datasets[0];
+  const dataset = await combineSourceDatasets(datasets);
   if (!dataset || dataset.rowCount <= 0) throw new Error('AUTHORITATIVE_SOURCE_EXTRACTION_EMPTY');
 
   const qualityScore = Math.max(0, Math.min(100, Math.round(dataset.qualityScore)));
@@ -122,7 +123,7 @@ async function authoritativeSourceInput(args: {
     quality_score: qualityScore,
     row_count: dataset.rowCount,
     column_count: dataset.columnCount,
-    datasets: [datasetForAnalysis(dataset)],
+    datasets: datasets.map(datasetForAnalysis),
     canonical_text: dataset.columns.map((c) => c.name).join(' | '),
     visual_assets: [],
     warnings: dataset.columns.flatMap((column) => Array.isArray(column.qualityIssues) ? column.qualityIssues : []),
