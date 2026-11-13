@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/use-session";
+import { Button } from '@/components/ui/Button';
 
 export const Route = createFileRoute("/tasks")({
   head: () => ({
@@ -36,28 +37,42 @@ function TasksPage() {
   const qc = useQueryClient();
   const [outcomeFor, setOutcomeFor] = useState<string | null>(null);
   const [outcome, setOutcome] = useState("");
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
-  const { data: tasks } = useQuery({
+  const { data: tasks, error: loadError, isPending, refetch } = useQuery({
     queryKey: ["work_tasks", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("work_tasks")
         .select("*")
         .order("due_date", { ascending: true });
+      if (error) throw error;
       return data ?? [];
     },
   });
 
   const setStatus = async (id: string, status: string, note?: string) => {
-    const { error } = await supabase
+    setBusyId(id);
+    setSaveError(null);
+    try {
+    const changes = { status, updated_at: new Date().toISOString(), ...(note !== undefined ? { outcome_note: note.trim() } : {}) };
+    const { data, error } = await supabase
       .from("work_tasks")
-      .update({ status, outcome_note: note ?? null, updated_at: new Date().toISOString() })
-      .eq("id", id);
-    if (error) toast.error(error.message);
-    else {
+      .update(changes)
+      .eq("id", id).select('id').single();
+    if (error) throw error;
+    if (!data) throw new Error('لم يتم حفظ التغيير؛ تحقق من صلاحية المهمة');
       toast.success(status === "done" ? "أُنجزت المهمة" : "تم التحديث");
-      qc.invalidateQueries({ queryKey: ["work_tasks"] });
+      await qc.invalidateQueries({ queryKey: ["work_tasks"] });
+      if (outcomeFor === id) { setOutcomeFor(null); setOutcome(''); }
+    } catch (cause) {
+      const message = cause instanceof Error ? cause.message : 'تعذر حفظ نتيجة المهمة؛ بقيت ملاحظاتك محفوظة في الحقل';
+      setSaveError(message);
+      toast.error(message);
+    } finally {
+      setBusyId(null);
     }
   };
 
@@ -81,7 +96,9 @@ function TasksPage() {
           مهام مستخرجة من تحليلاتك، موزعة حسب تخصص كل موظف.
         </p>
 
-        {loading && <p className="mt-8 text-sm text-muted-foreground">جارٍ التحميل…</p>}
+        {(loading || (user && isPending)) && <p role="status" className="mt-8 text-sm text-muted-foreground">جارٍ التحميل…</p>}
+        {loadError && <div role="alert" className="mt-4 text-sm text-foreground">تعذر تحميل المهام. <Button variant="ghost" onClick={() => void refetch()}>إعادة المحاولة</Button></div>}
+        {saveError && <p role="alert" className="mt-4 text-sm text-foreground">{saveError}</p>}
         {!loading && !user && (
           <p className="mt-8 text-sm text-muted-foreground">
             <Link to="/" className="text-primary hover:underline">سجّل دخولك</Link> لعرض مهامك.
@@ -117,6 +134,7 @@ function TasksPage() {
                     </div>
                     <h3 className="mt-2 font-semibold text-card-foreground">{t.title}</h3>
                     <p className="mt-1 text-sm text-muted-foreground">{t.detail}</p>
+                    <Link to="/analyses/$id" params={{ id: t.analysis_id }} className="mt-2 inline-block text-xs text-primary">التقرير والدليل</Link>
                     {t.outcome_note && (
                       <p className="mt-2 rounded-lg bg-muted p-2 text-xs text-muted-foreground">
                         النتيجة: {t.outcome_note}
@@ -124,38 +142,38 @@ function TasksPage() {
                     )}
                     {t.status !== "done" && (
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <button
-                          onClick={() => setOutcomeFor(outcomeFor === t.id ? null : t.id)}
+                        <Button
+                          disabled={busyId !== null}
+                          onClick={() => { setOutcomeFor(outcomeFor === t.id ? null : t.id); setOutcome(t.outcome_note ?? ''); setSaveError(null); }}
                           className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
                         >
                           إنجاز مع نتيجة
-                        </button>
-                        <button
+                        </Button>
+                        <Button variant="secondary"
+                          disabled={busyId !== null}
                           onClick={() => setStatus(t.id, "done")}
                           className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent"
                         >
                           إنجاز سريع
-                        </button>
+                        </Button>
                       </div>
                     )}
                     {outcomeFor === t.id && (
-                      <div className="mt-3 flex gap-2">
+                      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
                         <input
+                          aria-label="نتيجة التنفيذ"
                           value={outcome}
                           onChange={(e) => setOutcome(e.target.value)}
-                          placeholder="ماذا حدث بعد التنفيذ؟ (يتعلم النظام منها)"
-                          className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+                          placeholder="ماذا حدث بعد التنفيذ؟"
+                          className="min-w-0 flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
                         />
-                        <button
-                          onClick={() => {
-                            setStatus(t.id, "done", outcome);
-                            setOutcomeFor(null);
-                            setOutcome("");
-                          }}
+                        <Button
+                          disabled={busyId !== null || !outcome.trim()}
+                          onClick={() => void setStatus(t.id, "done", outcome)}
                           className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                         >
-                          حفظ
-                        </button>
+                          {busyId === t.id ? 'جارٍ الحفظ…' : 'حفظ'}
+                        </Button>
                       </div>
                     )}
                   </article>

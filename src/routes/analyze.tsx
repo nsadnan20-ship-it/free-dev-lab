@@ -5,8 +5,9 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/use-session";
 import { parseFile, sha256 } from "@/lib/universal/parse";
-import { analyzeTable, reportSignature } from "@/lib/universal/pipeline";
-import type { AnalysisResult } from "@/lib/universal/types";
+import { reportSignature } from "@/lib/universal/pipeline";
+import { analyzeWorkbook } from "@/lib/universal/workbook";
+import { Button } from '@/components/ui/Button';
 
 export const Route = createFileRoute("/analyze")({
   head: () => ({
@@ -41,6 +42,7 @@ function AnalyzePage() {
       const tables = await parseFile(file);
       if (!tables.length) throw new Error("لم يتم العثور على جدول بيانات في الملف");
       const table = tables[0];
+      if (!table) throw new Error('لم يتم العثور على جدول بيانات في الملف');
 
       setStatus("جارٍ التحليل الذكي…");
       const hash = await sha256(file);
@@ -53,9 +55,7 @@ function AnalyzePage() {
         .eq("user_id", user.id)
         .eq("file_hash", hash);
 
-      const result: AnalysisResult = analyzeTable(table, file.name, {
-        priorSameSignature: prior?.length ?? 0,
-      });
+      const result = analyzeWorkbook(tables, file.name, prior?.length ?? 0);
 
       setStatus("جارٍ الحفظ…");
       const { data: row, error } = await supabase
@@ -92,7 +92,7 @@ function AnalyzePage() {
             status: "open",
           })),
         );
-        if (tErr) throw tErr;
+        if (tErr) toast.error('حُفظ التحليل، لكن تعذر حفظ المهام: ' + tErr.message);
       }
 
       toast.success("تم التحليل والحفظ بنجاح");
@@ -113,12 +113,12 @@ function AnalyzePage() {
           <nav className="flex items-center gap-3 text-sm">
             <Link to="/tasks" className="text-muted-foreground hover:text-foreground">مهامي</Link>
             {user ? (
-              <button
+              <Button variant="ghost"
                 onClick={() => supabase.auth.signOut()}
                 className="text-muted-foreground hover:text-foreground"
               >
                 خروج
-              </button>
+              </Button>
             ) : (
               <Link to="/" className="text-muted-foreground hover:text-foreground">دخول</Link>
             )}
@@ -132,7 +132,7 @@ function AnalyzePage() {
           ارفع ملف Excel أو CSV أو JSON — أي نوع تقرير — وسيحلله المحرك ويخرج الرؤى والتوصيات والمهام.
         </p>
 
-        <button
+        <Button variant="secondary"
           type="button"
           disabled={busy || loading}
           onClick={() => inputRef.current?.click()}
@@ -150,7 +150,7 @@ function AnalyzePage() {
             <FileSpreadsheet className="ml-1 inline h-4 w-4" />
             xlsx • xls • csv • json — بالعربية أو الإنجليزية
           </span>
-        </button>
+        </Button>
         <input
           ref={inputRef}
           type="file"

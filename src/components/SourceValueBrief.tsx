@@ -11,7 +11,10 @@ export function SourceValueBrief({ sources }: { sources: BriefSource[] }) {
     const headers = [...new Set(source.rows.flatMap(Object.keys))].filter((h) => !h.startsWith('_source_'));
     const result = analyzeTable({ sheet: source.name, headers,
       rows: source.rows.map((row) => headers.map((h): Cell => typeof row[h] === 'number' ? row[h] as number : row[h] == null ? null : String(row[h]))),
-      sourceRows: source.rows.map((_, i) => i + 1), headerRow: 1 }, source.name);
+      sourceRows: source.rows.map((row, i) => {
+        const original = Number(row._source_row);
+        return Number.isInteger(original) && original > 0 ? original : i + 1;
+      }), headerRow: 1 }, source.name);
     return { source, result };
   }), [sources]);
   if (!analyses.length) return null;

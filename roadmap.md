@@ -1,4 +1,7 @@
 # Report-Advisor migration roadmap
+- [ ] Continue completion: repair context-preserving decision/work/outcome links and verify authenticated readback.
+- [ ] Cover the secondary analysis screen too: analyze every workbook sheet without mixing unrelated totals; expose sheet selection and saved results.
+- [ ] Make task completion failures visible and retain outcome input until saving succeeds.
 - [x] Repair upload → analysis → approval → reopen flow; verified a signed-in two-sheet report with 24 persisted rows and reload.
 - [x] Retain all extracted sheets and Arabic sales PDF continuation pages; regression tests cover distinct schemas and absent repeated headers.
 - [x] Improve import and report screens with per-table findings, evidence, actionable alerts and readable executive results.

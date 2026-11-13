@@ -1009,7 +1009,12 @@ export async function fetchSmartReport(jobId: string, expectedSourceHash: string
 
   if (!intelligenceEligible) {
     archetypeState = 'REVIEW_REQUIRED';
-    intelligence = emptyReportIntelligence(specialty);
+    intelligence = {
+      ...baseIntelligence,
+      summary: 'الاستنتاج المتخصص يحتاج مراجعة: ' + intelligenceGateReasons.join(' • ') + '. تظل نتائج كل جدول متاحة للفحص، ولا تعني اعتماد قرار تجاري.',
+      forecast: { ...baseIntelligence.forecast, note: 'لا يوجد إسقاط معتمد قبل استيفاء جودة المصدر والحقول والفترات المطلوبة.' },
+      guidance: { ...baseIntelligence.guidance, inspect: intelligenceGateReasons },
+    };
   } else if (detectedArchetype.profile) {
     try {
       const archetypeRun = runReportArchetype({

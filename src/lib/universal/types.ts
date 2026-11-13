@@ -109,6 +109,8 @@ export interface ArchetypeAcceleration {
 }
 
 export interface AnalysisResult {
+  /** Independent per-sheet results; absent on older single-table analyses. */
+  datasets?: AnalysisResult[];
   engineVersion: string;
   fileName: string;
   sheet: string | null;

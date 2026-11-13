@@ -1,10 +1,12 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CheckCircle2, AlertTriangle, Lightbulb, Compass, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { AnalysisResult, Insight, CapabilityResult } from "@/lib/universal/types";
+import { useSession } from '@/lib/use-session';
+import { Button } from '@/components/ui/Button';
 
 export const Route = createFileRoute("/analyses/$id")({
   head: () => ({
@@ -17,15 +19,6 @@ export const Route = createFileRoute("/analyses/$id")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  loader: async ({ params }) => {
-    const { data, error } = await supabase
-      .from("analyses")
-      .select("*")
-      .eq("id", params.id)
-      .single();
-    if (error || !data) throw notFound();
-    return data;
-  },
   component: AnalysisPage,
 });
 
@@ -54,8 +47,28 @@ const statusLabel: Record<string, string> = {
 type Tab = "overview" | "insights" | "capabilities" | "data";
 
 function AnalysisPage() {
-  const row = Route.useLoaderData();
-  const result = row.result as unknown as AnalysisResult;
+  const { id } = Route.useParams();
+  const { user, loading } = useSession();
+  const { data: row, error, isPending, refetch } = useQuery({
+    queryKey: ['analysis', user?.id, id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('analyses').select('*').eq('id', id).single();
+      if (error) throw error;
+      return data;
+    },
+  });
+  if (loading || (user && isPending)) return <p role="status" className="p-8 text-muted-foreground">جارٍ تحميل التقرير المحفوظ…</p>;
+  if (!user) return <div className="p-8 text-foreground">سجّل دخولك لعرض التقرير. <Link to="/" className="text-primary">دخول</Link></div>;
+  if (error || !row) return <div role="alert" className="p-8 text-foreground">تعذر قراءة التقرير المحفوظ. <Button variant="ghost" onClick={() => void refetch()}>إعادة المحاولة</Button></div>;
+  return <AnalysisContent key={row.id} row={row} />;
+}
+
+function AnalysisContent({ row }: { row: { id: string; result: unknown } }) {
+  const savedResult = row.result as unknown as AnalysisResult;
+  const datasets = savedResult.datasets?.length ? savedResult.datasets : [savedResult];
+  const [datasetIndex, setDatasetIndex] = useState(0);
+  const result = datasets[datasetIndex] ?? savedResult;
   const [tab, setTab] = useState<Tab>("overview");
 
   const { data: decisions, refetch: refetchDecisions } = useQuery({
@@ -103,15 +116,22 @@ function AnalysisPage() {
       </header>
 
       <main className="mx-auto max-w-5xl px-4 py-8">
-        <h1 className="text-2xl font-bold text-foreground">{result.fileName}</h1>
+        <h1 className="break-words text-2xl font-bold text-foreground">{result.fileName}</h1>
+        {datasets.length > 1 && <div className="mt-4 flex flex-wrap items-center gap-3">
+          <label htmlFor="analysis-dataset" className="text-sm font-medium text-foreground">الورقة</label>
+          <select id="analysis-dataset" value={datasetIndex} onChange={(event) => setDatasetIndex(Number(event.target.value))} className="max-w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground">
+            {datasets.map((dataset, index) => <option key={index} value={index}>{dataset.sheet ?? `جدول ${index + 1}`} — {dataset.rowCount} صف</option>)}
+          </select>
+          <span className="text-sm text-muted-foreground">{savedResult.rowCount} صف في {datasets.length} أوراق</span>
+        </div>}
         <p className="mt-1 text-sm text-muted-foreground">
           {result.rowCount} صف × {result.columnCount} عمود • جودة البيانات {result.qualityScore}/100
           {result.archetype.title ? ` • النموذج: ${result.archetype.title}` : " • تقرير عام (بدون نموذج متخصص)"}
         </p>
 
-        <div className="mt-6 flex gap-2 border-b border-border">
+        <div className="mt-6 flex flex-wrap gap-2 border-b border-border">
           {tabs.map((t) => (
-            <button
+            <Button variant="ghost"
               key={t.id}
               onClick={() => setTab(t.id)}
               className={`px-4 py-2 text-sm font-medium ${
@@ -121,7 +141,7 @@ function AnalysisPage() {
               }`}
             >
               {t.label}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -314,18 +334,18 @@ function InsightCard({
         )}
       </div>
       <div className="mt-3 flex gap-2">
-        <button
+        <Button
           onClick={() => onDecide(i.id, "approved")}
           className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90"
         >
           اعتماد
-        </button>
-        <button
+        </Button>
+        <Button variant="secondary"
           onClick={() => onDecide(i.id, "rejected")}
           className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent"
         >
           رفض
-        </button>
+        </Button>
       </div>
     </article>
   );
